@@ -1,5 +1,5 @@
 \documentclass[12pt]{article}
-\usepackage{hyperref}
+\usepackage[bookmarks=true]{hyperref}
 \usepackage{geometry}
  \geometry{
  a4paper,
@@ -16,6 +16,9 @@
 \usepackage{amsfonts}
 \usepackage[most]{tcolorbox} % box around equation
 \usepackage{esvect} % vectors
+\usepackage{chngcntr} % for control over counters in sections
+\counterwithin{equation}{section} % count equations only withing sections
+\usepackage{subfiles} % Best loaded last in preamble. For loading subfiles
 
 \title{Numerical solutions for hydrogen permeation in Python.}
 
@@ -24,82 +27,36 @@
 \begin{document}
 \maketitle
 
+\begin{abstract}
 I will describe several methods of solving the diffusion problem for the hydrogne permeation through a metal membrane, starting with the simplest cases. One dimensional membrane, no traps. There are explicit and implicit methods. We need to select the onse which are faster and more precise. The numerical solution is implemented in \href{https://www.python.org/}{Python} programming language. Calculations in pure Python are slow, but thera several methods to make them fast. One - to use specialized packages such as \href{https://numpy.org/}{numpy} and \href{https://www.scipy.org/}{scipy}. They have built in methods for operations on matrices and several solvers for systems of linear equations. Another option is to use \href{https://numba.pydata.org/}{numba} and jit, which compile the python code into some machine code, which improves the performance of python loops dramatically.
 
 But first things first, we will start the explanation with some explicit stencils, then explore some implicit stencils and hopefully in the future will address more sofisticated methods with variable space steps. I combined explanations from several resources, one of most helpful was a jupyter notebook course for simulation from 2014, their code is on \href{https://github.com/numerical-mooc/numerical-mooc}{GitHub/numerical-moc}. I also used works by \href{https://www.researchgate.net/profile/A_Pisarev}{A. A. Pisarev} and \href{https://www.researchgate.net/profile/E_Marenkov}{E. D. Marenkov} from MEPhI, as well as papers of \href{https://www.researchgate.net/profile/SK_Sharma2}{S. K. Sharma-san}.
+\end{abstract}
 
-\section{Permeation equation.}
-The general equation for hydrogen permeation trough a membrane, one-dimensional case.
+\section{Finite differnce methods}
+% ======================================================================================
+%
+% Introduction to fintie difference with Neuman boundary 
+%
+% ======================================================================================
+\subfile{sections/finitemethods.tex}
 
-\begin{align}
-    %\begin{cases}
-        &\frac{\partial u}{\partial t} = D \frac{\partial^2 u}{\partial x^2} + f(u) \label{eq:diff}\\
-        &\Gamma_{in}(t) + D\frac{\partial u}{\partial x}\big|_{x = 0} - k_{u}u^{2}(0,t) = 0\\
-        &-D\frac{\partial u}{\partial x}\big|_{x =L} - k_{d}u^{2}(L,t) = 0
-    %\end{cases}
-\end{align}
+\section{Permeation equation}
+% ======================================================================================
+%
+% Now going back to our hydrogen permeation problem.
+%
+% ======================================================================================
+\subfile{sections/permeation.tex}
 
-Here $u$ is the concentration, $t$ - time, $x$ - coordinate, $D$ - diffusion coefficient, $k_u$ and $k_d$ - are hydrogen recombination coefficients on the upstream and downstream sides, respectively. The function $f(u)$ may express the contribution of hydrogen traps. The $\Gamma_{in}(t)$ is the incident atomic hydrogen flux.
-
-There are several ways to approximate the actual derivatives with finite differences. The explicit-implicit approximation of Crank-Nicolson:
-\begin{equation}
-\frac{\partial^2 u}{\partial x^2}\Big|_{x = j \Delta x, t = n \Delta t} \approx \frac{1}{2 \Delta x^2} \left( U_{j+1}^n - 2 U_j^n + U_{j-1}^n + U_{j+1}^{n+1} - 2 U_j^{n+1} + U_{j-1}^{n+1}\right).
-\end{equation}
-
-Here $\Delta x$ and $\Delta t$ are the coordinate and time steps, respectively. When they are decided, we can write down the vectors for descrete coordinate and time:
-\begin{align}
-    t_n = n\Delta t, n = 0, \dots, N-1\\
-    x_j = j\Delta t, j = 0, \dots, J-1
-\end{align}
-where $N$ and $J$ - are number of points for time and space coorinates, respectively.
-
-Now we have the finite difference approximation, we can rewrite euqtion \ref{eq:diff} as follows:
-
-\begin{equation}
-    \frac{U_{j}^{n+1}-U_{j}^{n}}{\Delta t} = \frac{D}{2\Delta x^2}\left( U_{j+1}^n - 2 U_j^n + U_{j-1}^n + U_{j+1}^{n+1} - 2 U_j^{n+1} + U_{j-1}^{n+1}\right) + f(U_{j}^{n})
-\end{equation}
-
-By introducing $\sigma = \frac{\Delta t D}{2\Delta x^2}$ we can simplify the above equation:
-
-\begin{equation}
-    \tcboxmath{
-    -\sigma U_{j-1}^{n+1} + (1+2\sigma)U_{j}^{n+1} - \sigma U_{j+1}^{n+1} = \sigma U_{j-1}^{n} + (1-2\sigma) U_{j}^{n} + \sigma U_{j+1}^{n} + \Delta t f(U_{j}^{n})
-    }
-\end{equation}
-
-This gives us a system of linear equation for unknown vector $\vv{U}^{n+1}$. Two boundary conditions are outside our stencil, and we have to approach them separately, depending on the condition. In our case, we have squeared concentration in our boundary condition, which makes this approach slightly more complex. After the whole system is rewriten using the finite differneces, one can solve that system. One of the basic algrorythms for doing this is to use the \href{https://en.wikipedia.org/wiki/Tridiagonal_matrix_algorithm}{tridiagonal matrix algrorythm}.
 
 \section{Stencil cheat sheet.}
-Here I changed the space and time coordinate indices from $j$ and $n$ to more straight forward $x$ and $t$.
-\subsection{Stensils}
+% ======================================================================================
+%
+% Some useful formulas
+%
+% ======================================================================================
+\subfile{sections/cheatsheet.tex}
 
-Forward Euler method:
-\begin{equation}
-    \tcboxmath{
-    U_{x}^{t+1} = \sigma U_{x-1}^{t} + (1-2\sigma)U_{x}^{t} + \sigma U_{x+1}^{t}
-    }
-\end{equation}
-
-Backward Euler method:
-\begin{equation}
-    \tcboxmath{
-    -\sigma U_{x-1}^{t+1} + (1+2\sigma)U_{x}^{t+1} - \sigma U_{x+1}^{t+1} = U_{x}^{t}
-    }
-\end{equation}
-
-Crank-Nicolson method:
-\begin{equation}
-    \tcboxmath{
-    -\frac{\sigma}{2} U_{x-1}^{t+1} + (1+\sigma)U_{x}^{t+1} - \frac{\sigma}{2} U_{x+1}^{t+1} = \frac{\sigma}{2} U_{x-1}^{t} + (1-\sigma)U_{x}^{t} + \frac{\sigma}{2} U_{x+1}^{t}
-    }
-\end{equation}
-
-\subsection{Backward Euler}
-
-\begin{align}
-    -\sigma U_{x-1}^{t+1} &+ (1+2\sigma)U_{x}^{t+1} - \sigma U_{x+1}^{t+1} = U_{x}^{t}\\
-    U_{0}^{t+1} &= -\frac{D}{2k_u\Delta x} + \frac{1}{2}\sqrt{\left(\frac{D}{k_u\Delta x}\right)^2 + 4\frac{D}{k_u\Delta x}U_{1}^{t+1} + \Gamma^{t+1}}\\
-    U_{L}^{t+1} &= -\frac{D}{2k_d\Delta x} + \frac{1}{2}\sqrt{\left(\frac{D}{k_d\Delta x}\right)^2 + 4\frac{D}{k_d\Delta x}U_{L-1}^{t+1}}
-\end{align}
 
 \end{document}

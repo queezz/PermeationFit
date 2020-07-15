@@ -1,0 +1,35 @@
+\documentclass[../summary.tex]{subfiles}
+
+\begin{document}
+
+The general equation for hydrogen permeation trough a membrane, one-dimensional case.
+
+\begin{align}
+    %\begin{cases}
+        &\frac{\partial u}{\partial t} = D \frac{\partial^2 u}{\partial x^2} + f(u) \label{eq:diff}\\
+        &\Gamma_{in}(t) + D\frac{\partial u}{\partial x}\big|_{x = 0} - k_{u}u^{2}(0,t) = 0\label{eq:leftboundary}\\
+        &-D\frac{\partial u}{\partial x}\big|_{x =L} - k_{d}u^{2}(L,t) = 0\label{eq:rightboundary}
+    %\end{cases}
+\end{align}
+
+Here $u$ is the concentration, $t$ - time, $x$ - coordinate, $D$ - diffusion coefficient, $k_u$ and $k_d$ - are hydrogen recombination coefficients on the upstream and downstream sides, respectively. The function $f(u)$ may express the contribution of hydrogen traps. The $\Gamma_{in}(t)$ is the incident atomic hydrogen flux.
+Now we can take the system from previous chapter.
+The matrix in the non-boundary points is same as in equation \ref{eq:CN}. But we have to reevaluate the boundary coefficients according to our boundary condition \ref{eq:leftboundary}.
+
+\begin{equation}
+    \Gamma_{inc}^n - k_u U_0^{n2} + D\frac{U_1^n - U_0^n}{\Delta x} = 0,
+\end{equation}
+
+\begin{equation}
+    k_d U_{J-1}^{n2} + D\frac{U_{J-1}^n - U_{J-2}^n}{\Delta x} = 0
+\end{equation}
+By solving both quadratic equations for $U_0^n$ and $U_{J-1}^n$, we can evaluate their values based on the calculated concentration from the previous time layer:
+\begin{equation}
+    U_0^{n+1} = -\frac{D}{2k_u\Delta x} + \frac{1}{2} \sqrt{\Big(\frac{D}{k_u \Delta x}\Big)^2 + \frac{4DU_1^n}{k_u \Delta x} + \frac{4\Gamma_{inc}^n}{k_u}}
+    \end{equation}
+
+\begin{equation}
+    U_{J-1}^{n+1} = -\frac{D}{2k_d\Delta x} + \frac{1}{2} \sqrt{\Big(\frac{D}{k_d \Delta x}\Big)^2 + \frac{4DU_{J-2}^n}{k_d \Delta x}}
+\end{equation}
+
+\end{document}

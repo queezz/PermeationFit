@@ -1,23 +1,41 @@
 \documentclass[../summary.tex]{subfiles}
 \begin{document}    
 Here I changed the space and time coordinate indices from $j$ and $n$ to more straight forward $x$ and $t$.
-\subsection{Stensils}
+\subsection{Different $\sigma$}
+The $\sigma$ is defined in the finite difference approximation of the diffusion equation \ref{eq:diff}. For the Crank-Nicolson method, the second order derivative is approximated as half sum of both forward and backward Euler approximations.
+\begin{equation}
+    \frac{u_{x}^{t + 1} - u_{x}^{t}}{\Delta t} = \frac{D}{2 \Delta x^2}
+    \left(
+    (u_{x + 1}^{t + 1} - 2 u_{x}^{t + 1} + u_{x - 1}^{t + 1}) + 
+    (u_{x + 1}^{t} - 2 u_{x}^{t} + u_{x - 1}^{t})
+    \right)
+\end{equation}
+So the $\sigma=\frac{D\Delta t}{2\Delta x^2}$ is convenient.
 
-Forward Euler method:
+For explicit stencils we have differnt finite difference equation:
+\begin{equation}
+    \frac{u_{x}^{t + 1} - u_{x}^{t}}{\Delta t} = \frac{D}{\Delta x^2}
+    \left(u_{x + 1}^{t} - 2 u_{x}^{t} + u_{x - 1}^{t}\right)    
+\end{equation}
+In this case $\sigma = \frac{D\Delta t}{\Delta x^2}$  is convenient.
+
+\subsection{Stensils}
+Here I use $\sigma = \frac{D\Delta t}{\Delta x^2}$, one for all.
+
+Forward Euler method (explicit):
 \begin{equation}
     \tcboxmath{
     U_{x}^{t+1} = \sigma U_{x-1}^{t} + (1-2\sigma)U_{x}^{t} + \sigma U_{x+1}^{t}
     }
 \end{equation}
-
-Backward Euler method:
+Backward Euler method (implicit):
 \begin{equation}
     \tcboxmath{
     -\sigma U_{x-1}^{t+1} + (1+2\sigma)U_{x}^{t+1} - \sigma U_{x+1}^{t+1} = U_{x}^{t}
     }
 \end{equation}
 
-Crank-Nicolson method, $\sigma = \frac{D\Delta t}{\Delta x^2}$, as an $F$ in my oldcode:
+Crank-Nicolson method (implicit, second order in time), $\sigma = \frac{D\Delta t}{\Delta x^2}$:
 \begin{equation}
     \tcboxmath{
     -\frac{\sigma}{2} U_{x-1}^{t+1} + (1+\sigma)U_{x}^{t+1} - \frac{\sigma}{2} U_{x+1}^{t+1} = \frac{\sigma}{2} U_{x-1}^{t} + (1-\sigma)U_{x}^{t} + \frac{\sigma}{2} U_{x+1}^{t}

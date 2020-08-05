@@ -10,7 +10,10 @@ from numba import jit
 
 
 def BE(**kwargs):
-    """Calculate Permeated Flux"""
+    """
+    BE short for Backward Euler stencil
+    Calculate Permeated Flux
+    """
     Nx = kwargs.get("Nx", 30)
     Nt = kwargs.get("Nt", 100)
     T = kwargs.get("T", 100)  # 0-T - time interval for calculation
@@ -57,9 +60,14 @@ def BE(**kwargs):
     teta2 = D / (kd * dx)
 
     for n in range(0, Nt):
-        # calculate u[1] and u[Nx-1] using explicit stencil
+        # calculate u[1] and u[Nx-1]
+        # Boundary concentration on the next time layer
+        # using explicit approximation of derivative (equation 3.2,3.3 from Summary)
+        # Actually we are calculating U[1], so we just assume that U[0] = U[1], which is
+        # not very precise. But it gives us an approximation, because dt is small
         g0 = F * u_1[0] + (1 - 2 * F) * u_1[1] + F * u_1[2]
         gL = F * u_1[Nx - 2] + (1 - 2 * F) * u_1[Nx - 1] + F * u_1[Nx]
+        # Now we assume Neumann boundayr condition, with dU/dx = 0
         # put 1 for u[0] and u[Nx-1] in A
         A = diags(
             diagonals=[
@@ -72,15 +80,25 @@ def BE(**kwargs):
             format="csr",
         )
         # in the b (for BE) put roots of the quadratic equation for the border.
+        # b - vector of concentrations on the previous time layer
+        # Here we put in our roots of quadratics to calculate boundary concentrations from 2.2 and 2.3
         b = np.array(
             [-teta1 / 2.0 + 0.5 * np.sqrt(teta1 ** 2 + 4 * teta1 * g0 + 4 * G[n] / ku)]
             + [i for i in u_1[1:Nx]]
             + [-teta2 / 2.0 + 0.5 * np.sqrt(teta2 ** 2 + 4 * teta2 * gL)]
         )
+
+        # we are solving A*U{next time layer} = U{current time layer},
+        # Or Backward Euler method (implicit)
         # solve SLE
         u[:] = spsolve(A, b)
+
+        # Now to correct our approximation, we calculate the correction,
+        # Each time using concentration from previous solution for the same timelayer.
         u"Instead of u**2 put u*a, where a - u from previous step"
-        for _ in range(3):
+        ncorrection = kwargs.get("ncorrection", 3)
+        for _ in range(ncorrection):
+            # use boundary concentrations from our approximate solution in matrix A
             a0 = u[0]
             aL = u[Nx]
             A = diags(
@@ -95,9 +113,11 @@ def BE(**kwargs):
                 shape=(Nx + 1, Nx + 1),
                 format="csr",
             )
+            # why G[n], it's an dimensionless incident flux, not a concentration?
             b = np.array([G[n]] + [i for i in u_1[1:Nx]] + [0])
+            # Here again, Backward Euler stencil. But with new evaluated boundary concentrations.
             u[:] = spsolve(A, b)
-        u_1, u = u, u_1
+        u_1, u = u, u_1  # swap u and u_1
         inlet.append(ku * u_1[0] ** 2)
         outlet.append(kd * u_1[Nx] ** 2)
         if PLOT:

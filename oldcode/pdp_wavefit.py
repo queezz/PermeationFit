@@ -20,7 +20,7 @@ def BE(**kws):
     Nt = kws.get("Nt", 100)  # Number of time mesh points
     T = kws.get("T", None)  # Duration of the calculated permeation [s]
     D = kws.get("D", 1.1e-8)  # Diffusion coeff.
-    I = kws.get("I", None)  # I(x) - inintial concentration profile function
+    I = kws.get("I", None)  # I(x) - initial concentration profile function
     ku = kws.get("ku", None)  # upstream recombination coeff. []
     kd = kws.get("kd", None)  # downstream recombination coeff.
     ks = kws.get("ks", None)  # amplitude of the incident flux

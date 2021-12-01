@@ -4,9 +4,9 @@ from scipy.interpolate import interp1d
 import numpy as np
 import time
 import matplotlib.pylab as plt
-import os
+from pandas import DataFrame
 
-from numba import jit
+# from numba import jit
 
 
 def BE(**kwargs):
@@ -28,13 +28,13 @@ def BE(**kwargs):
     saveU = kwargs.get("saveU", None)
     Uinit = kwargs.get("Uinit", np.zeros(Nx + 1))
     # ------------------------------------------------------------------------------
-    ku = 2 * ku
-    kd = 2 * kd  # if this is applied, result is same with TMAP7. Why?
+    ku = 2 * ku  # if this is applied, result is same with TMAP7. Why?
+    kd = 2 * kd  # Maybe it's H2 -> 2*H?
     # ------------------------------------------------------------------------------
     G = G * ks
     if len(np.where(G < 0)[0]):
         return {"time": np.linspace(0, T, Nt + 1), "pdp": np.zeros(Nt + 1)}
-    start = time.clock()
+    start = time.perf_counter()  # time.clock() is depricated
     x = np.linspace(0, L, Nx + 1)  # mesh points in space
     t = np.linspace(0, T, Nt + 1)  # mesh points in time
     if I:
@@ -49,10 +49,8 @@ def BE(**kwargs):
     inlet.append(ku * u_1[0] ** 2)
     outlet.append(kd * u_1[Nx] ** 2)
     u = np.zeros(Nx + 1)
-    if saveU:
-        Usave = np.zeros((Nt + 1, Nx + 1), float)
-    if saveU:
-        Usave[0] = u_1
+    Usave = np.zeros((Nt + 1, Nx + 1), float)
+    Usave[0] = u_1
     if PLOT:
         plt.plot(x / 1e-6, u_1, "k-", lw=4)
     color_idx = np.linspace(0, 1, Nt)
@@ -104,9 +102,7 @@ def BE(**kwargs):
             A = diags(
                 diagonals=[
                     [-D / dx] + [-F for i in range(Nx - 1)],
-                    [D / dx + ku * a0]
-                    + [1.0 + 2.0 * F for i in range(Nx - 1)]
-                    + [D / dx + kd * aL],
+                    [D / dx + ku * a0] + [1.0 + 2.0 * F for i in range(Nx - 1)] + [D / dx + kd * aL],
                     [-F for i in range(Nx - 1)] + [-D / dx],
                 ],
                 offsets=[1, 0, -1],
@@ -121,11 +117,8 @@ def BE(**kwargs):
         inlet.append(ku * u_1[0] ** 2)
         outlet.append(kd * u_1[Nx] ** 2)
         if PLOT:
-            plt.plot(
-                x / 1e-6, u_1, ".-", color=plt.cm.jet(color_idx[n])
-            )  # @UndefinedVariable
-        if saveU:
-            Usave[n + 1] = u_1
+            plt.plot(x / 1e-6, u_1, ".-", color=plt.cm.jet(color_idx[n]))  # @UndefinedVariable
+        Usave[n + 1] = u_1
 
     if PLOT:
         font = {"family": "Times New Roman", "weight": "heavy", "size": 25}
@@ -136,21 +129,14 @@ def BE(**kwargs):
         ax.set_xlabel("x ($\mu m$)", fontweight="heavy")
         ax.set_ylabel("concentration ($m^{-3}$)", fontweight="heavy")
 
-    end = time.clock()
-    result = dict()
-    result.update(
-        [
-            ("reflected", inlet),
-            ("pdp", outlet),
-            ("time", t),
-            ("concentration", u_1),
-            ("calctime", end - start),
-        ]
-    )
-    if saveU:
-        return Usave, [t, outlet]
-    else:
-        return result
+    end = time.perf_counter()
+
+    result = {
+        "fluxes": DataFrame([t, inlet, outlet], index=["time", "rel", "perm"]).T,
+        "c": Usave,  # DataFrame(Usave, columns=["c"]),
+        "calctime": end - start,
+    }
+    return result
 
 
 def parameters():

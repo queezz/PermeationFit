@@ -11,8 +11,10 @@
       
       
       
-        <link rel="prev" href="../history/">
+        <link rel="prev" href="../../theory/finite_methods/">
       
+      
+        <link rel="next" href="../equations/">
       
       
         
@@ -23,7 +25,7 @@
     
     
       
-        <title>📐 Equation cheat sheet - Permeation</title>
+        <title>🕰️ History - Permeation</title>
       
     
     
@@ -76,7 +78,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#stencil-cheat-sheet" class="md-skip">
+        <a href="#background-context" class="md-skip">
           Skip to content
         </a>
       
@@ -110,7 +112,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              📐 Equation cheat sheet
+              🕰️ History
             
           </span>
         </div>
@@ -264,7 +266,7 @@
     
     
       <li class="md-tabs__item md-tabs__item--active">
-        <a href="../history/" class="md-tabs__link">
+        <a href="./" class="md-tabs__link">
           
   
   
@@ -520,34 +522,6 @@
                 
   
   
-  
-  
-    <li class="md-nav__item">
-      <a href="../history/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    🕰️ History
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
     
   
   
@@ -567,7 +541,7 @@
   <span class="md-ellipsis">
     
   
-    📐 Equation cheat sheet
+    🕰️ History
   
 
     
@@ -585,7 +559,7 @@
   <span class="md-ellipsis">
     
   
-    📐 Equation cheat sheet
+    🕰️ History
   
 
     
@@ -611,10 +585,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#definition-of-sigma" class="md-nav__link">
+  <a href="#early-models" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Definition of \(\sigma\)
+        🧪 Early models
       
     </span>
   </a>
@@ -622,10 +596,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#stencils" class="md-nav__link">
+  <a href="#formal-theory" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Stencils
+        📚 Formal theory
       
     </span>
   </a>
@@ -633,10 +607,21 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#backward-euler-with-permeation-boundary-conditions" class="md-nav__link">
+  <a href="#modern-checks" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Backward Euler with permeation boundary conditions
+        🔍 Modern checks
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#this-code" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        🧩 This code
       
     </span>
   </a>
@@ -647,6 +632,34 @@
   
 </nav>
       
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../equations/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    📐 Equation cheat sheet
+  
+
+    
+  </span>
+  
+  
+
+      </a>
     </li>
   
 
@@ -686,10 +699,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#definition-of-sigma" class="md-nav__link">
+  <a href="#early-models" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Definition of \(\sigma\)
+        🧪 Early models
       
     </span>
   </a>
@@ -697,10 +710,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#stencils" class="md-nav__link">
+  <a href="#formal-theory" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Stencils
+        📚 Formal theory
       
     </span>
   </a>
@@ -708,10 +721,21 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#backward-euler-with-permeation-boundary-conditions" class="md-nav__link">
+  <a href="#modern-checks" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Backward Euler with permeation boundary conditions
+        🔍 Modern checks
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#this-code" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        🧩 This code
       
     </span>
   </a>
@@ -738,49 +762,59 @@
   
 
 
-<h1 id="stencil-cheat-sheet">Stencil cheat sheet<a class="headerlink" href="#stencil-cheat-sheet" title="Permanent link">&para;</a></h1>
-<p>Space and time indices are denoted <span class="arithmatex">\(x\)</span> and <span class="arithmatex">\(t\)</span> here.</p>
-<h2 id="definition-of-sigma">Definition of <span class="arithmatex">\(\sigma\)</span><a class="headerlink" href="#definition-of-sigma" title="Permanent link">&para;</a></h2>
-<p>For <strong>Crank–Nicolson</strong>, the second derivative is approximated as the average of forward and backward Euler in time, giving:</p>
-<div class="arithmatex">\[
-\frac{u_{x}^{t + 1} - u_{x}^{t}}{\Delta t} = \frac{D}{2 \Delta x^2}
-\left(
-(u_{x + 1}^{t + 1} - 2 u_{x}^{t + 1} + u_{x - 1}^{t + 1}) +
-(u_{x + 1}^{t} - 2 u_{x}^{t} + u_{x - 1}^{t})
-\right)
-\]</div>
-<p>So <span class="arithmatex">\(\sigma = \frac{D\Delta t}{2\Delta x^2}\)</span>.</p>
-<p>For <strong>explicit</strong> (forward Euler) stencils:</p>
-<div class="arithmatex">\[
-\frac{u_{x}^{t + 1} - u_{x}^{t}}{\Delta t} = \frac{D}{\Delta x^2}
-\left(u_{x + 1}^{t} - 2 u_{x}^{t} + u_{x - 1}^{t}\right)
-\]</div>
-<p>In that case <span class="arithmatex">\(\sigma = \frac{D\Delta t}{\Delta x^2}\)</span>.</p>
-<p>Below, <span class="arithmatex">\(\sigma = \frac{D\Delta t}{\Delta x^2}\)</span> is used for all stencils.</p>
-<h2 id="stencils">Stencils<a class="headerlink" href="#stencils" title="Permanent link">&para;</a></h2>
-<p><strong>Forward Euler (explicit):</strong></p>
-<div class="arithmatex">\[
-U_{x}^{t+1} = \sigma U_{x-1}^{t} + (1-2\sigma)U_{x}^{t} + \sigma U_{x+1}^{t}
-\]</div>
-<p><strong>Backward Euler (implicit):</strong></p>
-<div class="arithmatex">\[
--\sigma U_{x-1}^{t+1} + (1+2\sigma)U_{x}^{t+1} - \sigma U_{x+1}^{t+1} = U_{x}^{t}
-\]</div>
-<p><strong>Crank–Nicolson</strong> (implicit, second order in time), with <span class="arithmatex">\(\sigma = \frac{D\Delta t}{\Delta x^2}\)</span>:</p>
-<div class="arithmatex">\[
--\frac{\sigma}{2} U_{x-1}^{t+1} + (1+\sigma)U_{x}^{t+1} - \frac{\sigma}{2} U_{x+1}^{t+1}
-= \frac{\sigma}{2} U_{x-1}^{t} + (1-\sigma)U_{x}^{t} + \frac{\sigma}{2} U_{x+1}^{t}
-\]</div>
-<h2 id="backward-euler-with-permeation-boundary-conditions">Backward Euler with permeation boundary conditions<a class="headerlink" href="#backward-euler-with-permeation-boundary-conditions" title="Permanent link">&para;</a></h2>
-<div class="arithmatex">\[
--\sigma U_{x-1}^{t+1} + (1+2\sigma)U_{x}^{t+1} - \sigma U_{x+1}^{t+1} = U_{x}^{t}
-\]</div>
-<div class="arithmatex">\[
-U_{0}^{t+1} = -\frac{D}{2k_u\Delta x} + \frac{1}{2}\sqrt{\left(\frac{D}{k_u\Delta x}\right)^2 + 4\frac{D}{k_u\Delta x}U_{1}^{t+1} + \Gamma^{t+1}}
-\]</div>
-<div class="arithmatex">\[
-U_{L}^{t+1} = -\frac{D}{2k_d\Delta x} + \frac{1}{2}\sqrt{\left(\frac{D}{k_d\Delta x}\right)^2 + 4\frac{D}{k_d\Delta x}U_{L-1}^{t+1}}
-\]</div>
+<h1 id="background-context">🧭 Background &amp; context<a class="headerlink" href="#background-context" title="Permanent link">&para;</a></h1>
+<h2 id="early-models">🧪 Early models<a class="headerlink" href="#early-models" title="Permanent link">&para;</a></h2>
+<p>The basic recombination–diffusion–permeation picture originates from early work on
+atomic hydrogen interaction with metals, in particular:</p>
+<ul>
+<li>
+<p>Ali-Khan, I.; Dietz, K. J.; Weldebrock, F. G.; Wienhold, P.,<br />
+<em>The rate of hydrogen release out of clean metallic surfaces</em>.<br />
+<a href="https://doi.org/10.1016/0022-3115(78)90167-8">DOI: 10.1016/0022-3115(78)90167-8</a></p>
+</li>
+<li>
+<p>Pick, M. A.; Sonnenberg, K.,<br />
+<em>A model for atomic hydrogen–metal interactions—application to recycling, recombination and permeation</em>.<br />
+<a href="https://doi.org/10.1016/0022-3115(85)90459-3">DOI: 10.1016/0022-3115(85)90459-3</a></p>
+</li>
+</ul>
+<p>These works established the surface–bulk coupling via recombination that is still
+commonly used today.<br />
+This package uses only the <strong>simplest form</strong> of these ideas.</p>
+<hr />
+<h2 id="formal-theory">📚 Formal theory<a class="headerlink" href="#formal-theory" title="Permanent link">&para;</a></h2>
+<p>A. A. Pisarev and his student E. D. Marenkov developed this framework much further,
+publishing multiple papers and textbooks that treat hydrogen transport in a
+systematic, physically detailed way.</p>
+<p>Their work is <strong>not followed directly</strong> here.<br />
+It is referenced mainly for <strong>context and future reading</strong>, to show how far the topic
+extends beyond the simplified model implemented in this code.</p>
+<hr />
+<h2 id="modern-checks">🔍 Modern checks<a class="headerlink" href="#modern-checks" title="Permanent link">&para;</a></h2>
+<p>More recent work revisits recombination coefficients and their consistent use in
+transport calculations, for example:</p>
+<ul>
+<li>Schmid, K.; Zibrov, M.,<br />
+<em>On the use of recombination rate coefficients in hydrogen transport calculations</em>.<br />
+<a href="https://doi.org/10.1088/1741-4326/ac07b2">DOI: 10.1088/1741-4326/ac07b2</a></li>
+</ul>
+<p>Such papers are useful for understanding limitations and ambiguities of simplified
+boundary conditions, rather than as direct implementation guides.</p>
+<hr />
+<h2 id="this-code">🧩 This code<a class="headerlink" href="#this-code" title="Permanent link">&para;</a></h2>
+<p>This is a <strong>tiny, intentionally simple</strong> codebase.</p>
+<p>That is a feature, not a limitation:
+- easy to understand,
+- easy to modify,
+- suitable for teaching, testing ideas, or quick estimates.</p>
+<p>For <strong>production-level simulations</strong>, established tools are usually a better choice:</p>
+<ul>
+<li><strong>FESTIM</strong> — https://festim.readthedocs.io/en/latest/  </li>
+<li><strong>TMAP8</strong> — https://mooseframework.inl.gov/TMAP8/</li>
+</ul>
+<p>With these tools now open source, developing a custom Monte Carlo model is also much
+more approachable than it used to be.</p>
+<p>This package is best viewed as an <strong>entry point</strong>, not an endpoint 🚪</p>
 
 
 

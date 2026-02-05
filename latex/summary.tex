@@ -1,0 +1,65 @@
+\documentclass[12pt]{article}
+\usepackage[bookmarks=true]{hyperref}
+%\usepackage{libertine} % libertine font
+%\usepackage[libertine]{newtxmath} % libertine font in math
+\usepackage[utopia]{mathdesign}
+\usepackage{geometry}
+ \geometry{
+ a4paper,
+ total={170mm,257mm},
+ left=20mm,
+ top=20mm,
+ }
+
+\usepackage{titlesec} % adds dot after section number
+\titlelabel{\thetitle.\quad} % adds dot after section number
+\usepackage{color}
+\usepackage{mathtools}
+\usepackage{amsmath} 
+\usepackage{amsfonts}
+\usepackage[most]{tcolorbox} % box around equation
+\usepackage{esvect} % vectors
+\usepackage{chngcntr} % for control over counters in sections
+\counterwithin{equation}{section} % count equations only withing sections
+\usepackage{subfiles} % Best loaded last in preamble. For loading subfiles
+
+\title{Numerical solutions for hydrogen permeation in Python.}
+
+\author{Arseniy A. Kuzmin}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+I will describe several methods of solving the diffusion problem for the hydrogne permeation through a metal membrane, starting with the simplest cases. One dimensional membrane, no traps. There are explicit and implicit methods. We need to select the onse which are faster and more precise. The numerical solution is implemented in \href{https://www.python.org/}{Python} programming language. Calculations in pure Python are slow, but thera several methods to make them fast. One - to use specialized packages such as \href{https://numpy.org/}{numpy} and \href{https://www.scipy.org/}{scipy}. They have built in methods for operations on matrices and several solvers for systems of linear equations. Another option is to use \href{https://numba.pydata.org/}{numba} and jit, which compile the python code into some machine code, which improves the performance of python loops dramatically.
+
+But first things first, we will start the explanation with some explicit stencils, then explore some implicit stencils and hopefully in the future will address more sofisticated methods with variable space steps. I combined explanations from several resources, one of most helpful was a jupyter notebook course for simulation from 2014, their code is on \href{https://github.com/numerical-mooc/numerical-mooc}{GitHub/numerical-moc}. I also used works by \href{https://www.researchgate.net/profile/A_Pisarev}{A. A. Pisarev} and \href{https://www.researchgate.net/profile/E_Marenkov}{E. D. Marenkov} from MEPhI, as well as papers of \href{https://www.researchgate.net/profile/SK_Sharma2}{S. K. Sharma-san}.
+\end{abstract}
+
+\section{Finite differnce methods}
+% ======================================================================================
+%
+% Introduction to fintie difference with Neuman boundary 
+%
+% ======================================================================================
+\subfile{sections/finitemethods.tex}
+
+\section{Permeation equation}
+% ======================================================================================
+%
+% Now going back to our hydrogen permeation problem.
+%
+% ======================================================================================
+\subfile{sections/permeation.tex}
+
+
+\section{Stencil cheat sheet.}
+% ======================================================================================
+%
+% Some useful formulas
+%
+% ======================================================================================
+\subfile{sections/cheatsheet.tex}
+
+
+\end{document}

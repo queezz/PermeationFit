@@ -6,6 +6,16 @@ Numerical solutions for **hydrogen permeation** through a one-dimensional metal 
 
 The package solves the 1D diffusion equation with flux/recombination BCs (as in e.g. TMAP7-style models). The main solver is **Backward Euler** (implicit) with iterative handling of the nonlinear boundary terms. You get time-dependent concentration in the membrane and inlet/outlet fluxes.
 
+## Venv
+
+```bash
+python -m venv "$HOME/.venvs/permeation"
+```
+
+```bash
+& $env:USERPROFILE\.venvs\permeation\Scripts\Activate.ps1
+```
+
 ## Install
 
 From the repository root:
@@ -55,11 +65,3 @@ pip install mkdocs-material
 mkdocs build
 # or: mkdocs serve
 ```
-
-## Non-goals
-
-- No rewriting of numerical methods or physics.
-- No CI, test suite, or PyPI publishing unless you add them later.
-- Scientific results are unchanged; only layout and packaging are updated.
-
-Refactoring notes and assumptions: **docs/DECISIONS.md**.

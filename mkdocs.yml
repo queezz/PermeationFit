@@ -1,0 +1,29 @@
+site_name: Permeation
+site_description: Numerical solutions for hydrogen permeation in Python
+repo_url: ""
+theme:
+  name: material
+  palette:
+    - scheme: default
+      primary: indigo
+  features:
+    - content.tabs.link
+
+nav:
+  - Home: index.md
+  - Theory:
+    - Diffusion equation: theory/diffusion.md
+    - Finite difference methods: theory/finite_methods.md
+  - Reference:
+    - Equation cheat sheet: reference/equations.md
+
+markdown_extensions:
+  - pymdownx.arithmatex:
+      generic: true
+  - pymdownx.superfences
+  - tables
+
+extra_javascript:
+  - javascripts/config.js
+  - https://polyfill.io/v3/polyfill.min.js?features=es6
+  - https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js

@@ -53,11 +53,16 @@ extra_javascript:
 extra_css:
   - styles/brand.css
 
+# Top-right repo link
+repo_url: https://github.com/queezz/PermeationFit
+repo_name: queezz/PermeationFit
+
+# MARK: nav
 nav:
-  - Home: index.md
-  - Theory:
-    - Diffusion equation: theory/diffusion.md
-    - Finite difference methods: theory/finite_methods.md
-  - References:
-    - History: reference/history.md
-    - Equation cheat sheet: reference/equations.md
+  - 🏠 Home: index.md
+  - 🧠 Theory:
+      - 🌊 Diffusion equation: theory/diffusion.md
+      - 🧮 Finite difference methods: theory/finite_methods.md
+  - 📚 References:
+      - 🕰️ History: reference/history.md
+      - 📐 Equation cheat sheet: reference/equations.md

@@ -1,19 +1,85 @@
-# Numerical solutions for hydrogen permeation in Python
+# Hydrogen permeation
+Simple numerical diffusion models in Python.
 
-**Author:** Arseniy A. Kuzmin
+This repository is a **small Python package plus examples** for solving the 1D hydrogen diffusion / permeation problem in a metal membrane.
 
-## Abstract
+It started as a LaTeX note collection and gradually turned into runnable code.  
+Now it’s documented with **MkDocs** and focuses on **practical use + minimal theory**.
 
-This project describes several methods for solving the diffusion problem for hydrogen permeation through a metal membrane, starting with the simplest cases: one-dimensional membrane, no traps. Both explicit and implicit methods are considered, with the aim of selecting schemes that are fast and accurate. The numerical solution is implemented in [Python](https://www.python.org/). Calculations in pure Python are slow; common options to speed them up are to use [NumPy](https://numpy.org/) and [SciPy](https://www.scipy.org/) for array and linear algebra operations, or [Numba](https://numba.pydata.org/) and JIT compilation for loops.
+The goal here is not to be exhaustive or perfectly general, but to provide:
 
-The explanation starts with explicit stencils, then implicit stencils (including Backward Euler as used in this package). Helpful references include the [numerical-mooc](https://github.com/numerical-mooc/numerical-mooc) Jupyter notebooks, and works by A. A. Pisarev and E. D. Marenkov (MEPhI) and S. K. Sharma.
+- working numerical schemes,
+- clear assumptions,
+- and examples that are easy to modify.
 
-## Contents
+If you need a fast way to *run* a permeation model and understand what the code is doing, this is for you.
 
-- [Diffusion equation](theory/diffusion.md) — permeation PDE and boundary conditions
-- [Finite difference methods](theory/finite_methods.md) — Crank–Nicolson and grid setup
-- [Equation cheat sheet](reference/equations.md) — stencils and \(\sigma\) definitions
+---
 
-## Figures
+## What’s inside
 
-Figures generated from the notebooks are in the repository folder `figures/` (e.g. `figures/diffusionpyexample0.png`).
+- **1D diffusion equation** for hydrogen in a flat membrane  
+  (no traps, no bulk reactions — the baseline case)
+
+- **Finite-difference schemes**
+  - explicit stencils (for intuition)
+  - implicit schemes (Backward Euler, Crank–Nicolson–style grids)
+
+- **Python implementations**
+  - NumPy / SciPy for arrays and sparse solvers
+  - structured so you can swap parameters and boundary conditions easily
+
+- **Examples**
+  - how to run a simulation
+  - how to extract permeation flux
+  - how numerical choices affect stability and speed
+
+This is intentionally **example-driven**, not framework-heavy.
+
+---
+
+## What this is *not*
+
+- Not a polished simulation framework
+- Not a benchmark against every solver under the sun
+- Not a review article
+
+If you need traps, multiple species, or full thermo-kinetics — this code is meant to be a **starting point**, not the final word.
+
+---
+
+## Documentation map
+
+- [Diffusion equation](theory/diffusion.md)  
+  Governing PDE and boundary conditions used here
+
+- [Finite difference methods](theory/finite_methods.md)  
+  Grid setup, stencils, and stability notes
+
+- [Equation cheat sheet](reference/equations.md)  
+  Stencils, coefficients, and σ definitions used in the code
+
+---
+
+## References
+This package does **not** attempt to reproduce or follow the full body of hydrogen
+transport theory and simulation developed over the last decades.
+
+Instead, it implements a **minimal recombination–diffusion model** as a clean,
+transparent starting point — something that is easy to read, run, and modify.
+
+That said, it sits within a much broader historical and methodological context,
+which is worth being aware of: [A bit of history](reference/history.md). 
+
+
+## Why MkDocs 
+*(and not LaTeX)*
+
+LaTeX was great for derivations.  
+MkDocs is better for:
+
+- code + explanation living together,
+- quick edits,
+- examples that actually run.
+
+The math hasn’t disappeared — it’s just no longer pretending to be a paper.

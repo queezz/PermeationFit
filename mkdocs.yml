@@ -1,13 +1,57 @@
 site_name: Permeation
 site_description: Numerical solutions for hydrogen permeation in Python
+docs_dir: docs
 repo_url: ""
+
 theme:
   name: material
-  palette:
-    - scheme: default
-      primary: indigo
+  icon:
+    repo: fontawesome/brands/github
   features:
-    - content.tabs.link
+    - navigation.instant
+    - navigation.tracking
+    - content.code.copy
+    - navigation.tabs
+    - content.image.zoom
+  palette:
+    - scheme: bh-dark
+      primary: custom
+      accent: yellow
+      toggle:
+        icon: material/weather-sunny
+        name: Switch to light mode
+    - scheme: default
+      primary: amber
+      accent: red
+      toggle:
+        icon: material/weather-night
+        name: Switch to dark mode
+
+plugins:
+  - search
+
+markdown_extensions:
+  - admonition
+  - attr_list
+  - def_list
+  - footnotes
+  - pymdownx.details
+  - pymdownx.superfences
+  - pymdownx.arithmatex:
+      generic: true
+  - toc:
+      permalink: true
+  - pymdownx.highlight
+  - pymdownx.inlinehilite
+  - tables
+  - md_in_html
+
+extra_javascript:
+  - javascripts/config.js
+  - https://polyfill.io/v3/polyfill.min.js?features=es6
+  - https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js
+extra_css:
+  - styles/brand.css
 
 nav:
   - Home: index.md
@@ -16,14 +60,3 @@ nav:
     - Finite difference methods: theory/finite_methods.md
   - Reference:
     - Equation cheat sheet: reference/equations.md
-
-markdown_extensions:
-  - pymdownx.arithmatex:
-      generic: true
-  - pymdownx.superfences
-  - tables
-
-extra_javascript:
-  - javascripts/config.js
-  - https://polyfill.io/v3/polyfill.min.js?features=es6
-  - https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js

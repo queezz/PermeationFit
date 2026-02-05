@@ -58,5 +58,6 @@ nav:
   - Theory:
     - Diffusion equation: theory/diffusion.md
     - Finite difference methods: theory/finite_methods.md
-  - Reference:
+  - References:
+    - History: reference/history.md
     - Equation cheat sheet: reference/equations.md

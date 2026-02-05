@@ -56,8 +56,10 @@ That is a feature, not a limitation:
 
 For **production-level simulations**, established tools are usually a better choice:
 
-- **FESTIM** — https://festim.readthedocs.io/en/latest/  
-- **TMAP8** — https://mooseframework.inl.gov/TMAP8/
+- [FESTIM](https://festim.readthedocs.io/en/latest/){ target="_blank" }
+- [TMAP8](https://mooseframework.inl.gov/TMAP8/){ target="_blank" }
+
+
 
 With these tools now open source, developing a custom Monte Carlo model is also much
 more approachable than it used to be.

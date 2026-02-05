@@ -24,6 +24,11 @@ From the repository root:
 pip install -e .
 ```
 
+Or install `docs` to run `mkdocs`
+```bash
+python -m pip install -e ".[docs]"
+```
+
 This installs the `permeation` package in editable mode. Dependencies: NumPy, SciPy, pandas.
 
 ## Quick start

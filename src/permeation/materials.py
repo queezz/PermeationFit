@@ -2,9 +2,10 @@
 
 from __future__ import annotations
 
-from typing import Any, Callable
+from typing import Any, Callable, Sequence
 
 import numpy as np
+from typing import Sequence, Callable
 
 
 def constant_G(value: float = 0.0) -> Callable[[int, float], np.ndarray]:
@@ -13,8 +14,10 @@ def constant_G(value: float = 0.0) -> Callable[[int, float], np.ndarray]:
 
     Returns a callable (Nt, T) -> array of shape (Nt+1,) filled with value.
     """
+
     def gen(Nt: int, T: float) -> np.ndarray:
         return np.full(Nt + 1, value, dtype=float)
+
     return gen
 
 
@@ -33,6 +36,7 @@ def step_G(
 
     (Nt, T) -> array of shape (Nt+1,) with correct time mapping.
     """
+
     def gen(Nt: int, T: float) -> np.ndarray:
         t = np.linspace(0, T, Nt + 1)
         t_start = t_start_frac * T
@@ -40,6 +44,48 @@ def step_G(
         out = np.zeros(Nt + 1, dtype=float)
         out[(t >= t_start) & (t <= t_end)] = value
         return out
+
+    return gen
+
+
+def steps_from_starts(
+    values: Sequence[float],
+    t_starts: Sequence[float],
+) -> list[tuple[float, float, float]]:
+    if len(values) != len(t_starts):
+        raise ValueError("values and t_starts must have same length")
+
+    t_ends = list(t_starts[1:]) + [1.0]
+    return list(zip(values, t_starts, t_ends))
+
+
+def multi_step_G(
+    steps: Sequence[tuple[float, float, float]],
+) -> Callable[[int, float], np.ndarray]:
+    """
+    G generator: multiple step segments across the run.
+
+    Parameters
+    ----------
+    steps : sequence of (value, t_start_frac, t_end_frac)
+        Each step applies `value` between t_start_frac*T and t_end_frac*T.
+        If steps overlap, later entries override earlier ones.
+
+    Returns
+    -------
+    callable
+        (Nt, T) -> array of shape (Nt+1,) with correct time mapping.
+    """
+
+    def gen(Nt: int, T: float) -> np.ndarray:
+        t = np.linspace(0, T, Nt + 1)
+        out = np.zeros(Nt + 1, dtype=float)
+        for value, t_start_frac, t_end_frac in steps:
+            t_start = t_start_frac * T
+            t_end = t_end_frac * T
+            out[(t >= t_start) & (t <= t_end)] = value
+        return out
+
     return gen
 
 
@@ -82,7 +128,11 @@ class Parameters:
         self.Tend = Tend
         self.PLOT = PLOT
         self.I = I
-        self.Uinit = np.zeros(Nx + 1, dtype=float) if Uinit is None else np.asarray(Uinit, dtype=float)
+        self.Uinit = (
+            np.zeros(Nx + 1, dtype=float)
+            if Uinit is None
+            else np.asarray(Uinit, dtype=float)
+        )
         self.G_generator = G_generator if G_generator is not None else zeros_G()
 
     def get_G(self) -> np.ndarray:
@@ -168,4 +218,3 @@ class Parameters:
             w = max(len(k) for k, _ in rows)
             for k, v in rows:
                 print(f"{k:<{w}} : {v}")
-    

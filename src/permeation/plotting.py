@@ -12,6 +12,7 @@ from typing import Any, Sequence
 import numpy as np
 
 
+# MARK: profiles
 def plot_profiles(
     result: dict[str, Any],
     time_idx: int | Sequence[int] | None = None,
@@ -76,7 +77,7 @@ def plot_profiles(
         ax.get_figure().savefig(savepath, bbox_inches="tight")
     return ax
 
-
+# MARK: fluxes
 def plot_fluxes(
     result: dict[str, Any],
     ax: Any = None,
@@ -116,7 +117,7 @@ def plot_fluxes(
         ax.get_figure().savefig(savepath, bbox_inches="tight")
     return ax
 
-
+# MARK: 3D
 def plot_concentration_3d(
     result: dict[str, Any],
     ax: Any = None,
@@ -184,6 +185,7 @@ def plot_concentration_3d(
         ax.get_figure().savefig(savepath, bbox_inches="tight")
     return ax
 
+# MARK: summary
 def plot_summary(
     result,
     profile_time_idx=None,

@@ -29,6 +29,10 @@ Or install `docs` to run `mkdocs`
 python -m pip install -e ".[docs]"
 ```
 
+```bash
+python -m pip install -e ".[docs,dev]"
+```
+
 This installs the `permeation` package in editable mode. Dependencies: NumPy, SciPy, pandas.
 
 ## Quick start

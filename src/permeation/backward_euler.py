@@ -114,6 +114,7 @@ def BE(parameters: Parameters, **kwargs: Any) -> dict[str, Any]:
             "c": np.zeros((Nt + 1, Nx + 1)),
             "fluxes": pd.DataFrame({"time": t_arr, "rel": 0.0, "perm": 0.0}),
             "params": resolved,
+            "G": G,
             "calctime": 0.0,
             "pdp": np.zeros(Nt + 1),
         }
@@ -210,6 +211,7 @@ def BE(parameters: Parameters, **kwargs: Any) -> dict[str, Any]:
         "c": Usave,
         "fluxes": fluxes_df,
         "params": resolved,
+        "G": G,
         "calctime": elapsed,
         "pdp": np.array(outlet),
     }

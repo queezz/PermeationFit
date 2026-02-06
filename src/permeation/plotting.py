@@ -18,6 +18,8 @@ def plot_profiles(
     time_idx: int | Sequence[int] | None = None,
     ax: Any = None,
     savepath: str | None = None,
+    show_colorbar: bool = True,
+    cbar_kwargs: dict[str, Any] | None = None,
 ) -> Any:
     """
     Plot concentration vs position (spatial profiles).
@@ -32,6 +34,10 @@ def plot_profiles(
         Axes to plot on; if None, use current axes (gca).
     savepath : str, optional
         If set, save the figure to this path with bbox_inches="tight".
+    show_colorbar : bool, optional
+        If True, add a colorbar for time (default True).
+    cbar_kwargs : dict, optional
+        Extra keyword args passed to plt.colorbar when show_colorbar is True.
 
     Returns
     -------
@@ -69,13 +75,15 @@ def plot_profiles(
             ax.plot(x_um, c[k], color=color)
     ax.set_xlabel("x (µm)")
     ax.set_ylabel("concentration (m⁻³)")
-    cbar = plt.colorbar(sm, ax=ax)
-    cbar.set_label("time (s)")
+    if show_colorbar:
+        cbar = plt.colorbar(sm, ax=ax, **(cbar_kwargs or {}))
+        cbar.set_label("time (s)")
     ax.grid(True, alpha=0.3)
     ax.get_figure().subplots_adjust(left=0.22)
     if savepath:
         ax.get_figure().savefig(savepath, bbox_inches="tight")
     return ax
+
 
 # MARK: fluxes
 def plot_fluxes(
@@ -106,8 +114,8 @@ def plot_fluxes(
         _, ax = plt.subplots()
 
     t = fluxes["time"]
-    ax.plot(t, fluxes["rel"], label="inlet (desorbed)", color="C0")
-    ax.plot(t, fluxes["perm"], label="outlet (permeation)", color="C1")
+    ax.plot(t, fluxes["rel"], label="inlet (desorbed)", color="C0", linewidth=2)
+    ax.plot(t, fluxes["perm"], label="outlet (permeation)", color="C1", linewidth=1)
     ax.set_xlabel("time (s)")
     ax.set_ylabel("flux (m⁻² s⁻¹)")
     ax.legend(loc="best")
@@ -116,6 +124,7 @@ def plot_fluxes(
     if savepath:
         ax.get_figure().savefig(savepath, bbox_inches="tight")
     return ax
+
 
 # MARK: 3D
 def plot_concentration_3d(
@@ -159,7 +168,7 @@ def plot_concentration_3d(
 
     c_max = float(np.max(c))
     pwr = int(np.round(np.log10(c_max))) if c_max > 0 else 0
-    scale = 10.0 ** pwr
+    scale = 10.0**pwr
     a = c / scale if scale > 0 else c
 
     if ax is None:
@@ -168,7 +177,9 @@ def plot_concentration_3d(
 
     cmap_obj = mpl_cm.get_cmap(cmap)
     surf = ax.plot_surface(
-        X, Y, a,
+        X,
+        Y,
+        a,
         cmap=cmap_obj,
         vmin=0.0,
         vmax=np.max(a) if a.size else 1.0,
@@ -185,6 +196,7 @@ def plot_concentration_3d(
         ax.get_figure().savefig(savepath, bbox_inches="tight")
     return ax
 
+
 # MARK: summary
 def plot_summary(
     result,
@@ -194,31 +206,32 @@ def plot_summary(
     savepath=None,
 ):
     import matplotlib.pyplot as plt
-    from matplotlib.gridspec import GridSpec
+    from matplotlib.gridspec import GridSpec, GridSpecFromSubplotSpec
     import numpy as np
 
     fig = plt.figure(figsize=figsize)
 
     gs = GridSpec(
         nrows=2,
-        ncols=3,
+        ncols=2,
         figure=fig,
-        width_ratios=(1.0, 1.4, 0.06),   # left / 3D / colorbar
+        width_ratios=(1.0, 1.6),
         height_ratios=(1.0, 1.0),
-        wspace=0.4,
-        hspace=0.45,
+        wspace=0.35,
+        hspace=0.2,
     )
 
     ax_flux = fig.add_subplot(gs[0, 0])
     ax_prof = fig.add_subplot(gs[1, 0])
-    ax_3d   = fig.add_subplot(gs[:, 1], projection="3d")
 
+    # 👇 span both rows
+    ax_3d = fig.add_subplot(gs[:, 1], projection="3d")
 
     # --- Fluxes ---
     fluxes = result["fluxes"]
     flux_max = float(np.nanmax(np.abs([fluxes["rel"].max(), fluxes["perm"].max()])))
     flux_pwr = int(np.floor(np.log10(flux_max))) if flux_max > 0 else 0
-    flux_scale = 10.0 ** flux_pwr
+    flux_scale = 10.0**flux_pwr
     fluxes_scaled = fluxes.copy()
     if flux_scale > 0:
         fluxes_scaled["rel"] = fluxes_scaled["rel"] / flux_scale
@@ -226,7 +239,7 @@ def plot_summary(
     plot_fluxes({**result, "fluxes": fluxes_scaled}, ax=ax_flux)
     ax_flux.legend(
         loc="lower left",
-        bbox_to_anchor=(0.0, 1.02),
+        bbox_to_anchor=(0.0, 1.01),
         frameon=False,
         borderaxespad=0.0,
     )
@@ -236,12 +249,34 @@ def plot_summary(
     t = np.asarray(result["time"])
     c = np.asarray(result["c"])
 
-    # --- Profiles ---
+    # --- Incident flux G (right axis on panel a) ---
+    G = result.get("G")
+    if G is None:
+        G = result.get("params", {}).get("G")
+    if G is None:
+        G = np.zeros_like(t)
+    G = np.asarray(G, dtype=float)
+    g_max = float(np.nanmax(np.abs(G))) if G.size else 0.0
+    g_pwr = int(np.floor(np.log10(g_max))) if g_max > 0 else 0
+    g_scale = 10.0**g_pwr
+    G_scaled = G / g_scale if g_scale > 0 else G
+    ax_g = ax_flux.twinx()
+    ax_g.plot(t, G_scaled, color="k", linestyle="--", label="incident (G)")
+    ax_g.set_ylabel(f"G × 10^{g_pwr} (m⁻² s⁻¹)")
+    ax_g.grid(False)
+
+    # --- Profiles (2D) ---
     prof_max = float(np.nanmax(np.abs(c))) if c.size else 0.0
     prof_pwr = int(np.floor(np.log10(prof_max))) if prof_max > 0 else 0
-    prof_scale = 10.0 ** prof_pwr
+    prof_scale = 10.0**prof_pwr
     c_scaled = c / prof_scale if prof_scale > 0 else c
-    plot_profiles({**result, "c": c_scaled}, time_idx=profile_time_idx, ax=ax_prof)
+    plot_profiles(
+        {**result, "c": c_scaled},
+        time_idx=profile_time_idx,
+        ax=ax_prof,
+        show_colorbar=True,
+        cbar_kwargs={"shrink": 0.75},
+    )
     ax_prof.set_ylabel(f"concentration × 10^{prof_pwr} (m⁻³)")
 
     # --- 3D surface ---
@@ -251,7 +286,9 @@ def plot_summary(
     Z = c / (10**pwr)
 
     surf = ax_3d.plot_surface(
-        X, Y, Z,
+        X,
+        Y,
+        Z,
         cmap=cmap,
         linewidth=0,
         antialiased=False,
@@ -291,9 +328,18 @@ def plot_summary(
         va="top",
         fontweight="bold",
     )
-
+    ax_prof.text(
+        -0.1,
+        1.1,
+        "b.",
+        transform=ax_prof.transAxes,
+        ha="left",
+        va="top",
+        fontweight="bold",
+    )
 
     if savepath:
         fig.savefig(savepath, bbox_inches="tight")
 
-    return ax_flux, ax_prof, ax_3d
+    fig.subplots_adjust(top=0.92)
+    return ax_flux, ax_3d, ax_prof

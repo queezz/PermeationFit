@@ -61,8 +61,10 @@ repo_name: queezz/PermeationFit
 nav:
   - 🏠 Home: index.md
   - 🧠 Theory:
+      - Backward Euler: theory/backward-euler.md
       - 🌊 Diffusion equation: theory/diffusion.md
-      - 🧮 Finite difference methods: theory/finite_methods.md
+      - 🧮 Finite difference methods: theory/finite-methods.md
   - 📚 References:
       - 🕰️ History: reference/history.md
+      - 🎶 Notation: reference/notation.md
       - 📐 Equation cheat sheet: reference/equations.md

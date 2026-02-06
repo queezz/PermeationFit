@@ -53,7 +53,7 @@ If you need traps, multiple species, or full thermo-kinetics — this code is me
 - [Diffusion equation](theory/diffusion.md)  
   Governing PDE and boundary conditions used here
 
-- [Finite difference methods](theory/finite_methods.md)  
+- [Finite difference methods](theory/finite-methods.md)  
   Grid setup, stencils, and stability notes
 
 - [Equation cheat sheet](reference/equations.md)  

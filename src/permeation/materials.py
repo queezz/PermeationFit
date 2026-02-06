@@ -115,3 +115,57 @@ class Parameters:
             "Uinit": self.Uinit,
             "G": self.get_G(),
         }
+
+    def show(self, *, array_preview: int = 4) -> None:
+        """
+        Pretty-print parameters for inspection.
+
+        - Floats shown in scientific notation when appropriate
+        - Arrays shown with a short preview
+        """
+
+        def fmt_scalar(v):
+            if isinstance(v, float):
+                av = abs(v)
+                if (av != 0) and (av >= 1e6 or av < 1e-3):
+                    return f"{v:.3e}"
+                return v
+            return v
+
+        def fmt_array(a: np.ndarray):
+            if a.size == 0:
+                return "[]"
+            n = min(array_preview, a.size)
+            head = " ".join(f"{x:.3g}" for x in a[:n])
+            if a.size > n:
+                return f"[{head} …] (len={a.size})"
+            return f"[{head}]"
+
+        rows = [
+            ("Nx", self.Nx),
+            ("Nt", self.Nt),
+            ("T", fmt_scalar(self.T)),
+            ("D", fmt_scalar(self.D)),
+            ("L", fmt_scalar(self.L)),
+            ("ku", fmt_scalar(self.ku)),
+            ("kd", fmt_scalar(self.kd)),
+            ("ks", fmt_scalar(self.ks)),
+            ("ncorrection", self.ncorrection),
+            ("Tend", fmt_scalar(self.Tend)),
+            ("PLOT", self.PLOT),
+            ("I", self.I),
+            ("Uinit", fmt_array(self.Uinit)),
+            ("G", fmt_array(self.get_G())),
+        ]
+
+        try:
+            import pandas as pd
+            from IPython.display import display
+
+            df = pd.DataFrame(rows, columns=["parameter", "value"])
+            display(df)
+        except Exception:
+            w = max(len(k) for k, _ in rows)
+            for k, v in rows:
+                print(f"{k:<{w}} : {v}")
+    

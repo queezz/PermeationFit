@@ -47,7 +47,7 @@ def plot_profiles(
     x_um = x / 1e-6
 
     if ax is None:
-        ax = plt.gca()
+        _, ax = plt.subplots()
 
     n_times = c.shape[0]
     if time_idx is None:
@@ -71,6 +71,7 @@ def plot_profiles(
     cbar = plt.colorbar(sm, ax=ax)
     cbar.set_label("time (s)")
     ax.grid(True, alpha=0.3)
+    ax.get_figure().subplots_adjust(left=0.22)
     if savepath:
         ax.get_figure().savefig(savepath, bbox_inches="tight")
     return ax
@@ -101,7 +102,7 @@ def plot_fluxes(
 
     fluxes = result["fluxes"]
     if ax is None:
-        ax = plt.gca()
+        _, ax = plt.subplots()
 
     t = fluxes["time"]
     ax.plot(t, fluxes["rel"], label="inlet (reflected)", color="C0")
@@ -110,6 +111,7 @@ def plot_fluxes(
     ax.set_ylabel("flux (m⁻² s⁻¹)")
     ax.legend(loc="best")
     ax.grid(True, alpha=0.3)
+    ax.get_figure().subplots_adjust(left=0.22)
     if savepath:
         ax.get_figure().savefig(savepath, bbox_inches="tight")
     return ax

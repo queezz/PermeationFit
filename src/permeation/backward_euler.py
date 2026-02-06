@@ -1,8 +1,31 @@
 """
 Backward Euler solver for 1D permeation PDE with recombination boundary conditions.
 
-Spatial discretisation: finite differences. Boundary concentrations from quadratic
-BCs; iterative correction (linearise u² as u·a with a from previous iterate).
+Numerical method summary
+------------------------
+Time integration:
+  • Backward Euler (fully implicit, first order in time)
+
+Spatial discretisation:
+  • 1D second-order central finite differences on a uniform grid
+
+Linear system:
+  • At each time step, solve a sparse tridiagonal system
+      (I - Δt·D·L) u^{n+1} = u^n
+    where L is the discrete Laplacian
+  • Implemented using scipy.sparse.diags + scipy.sparse.linalg.spsolve
+
+Boundary conditions:
+  • Nonlinear recombination (quadratic flux) boundary conditions at x=0 and x=L
+  • Treated implicitly via Picard (fixed-point) iteration:
+      u² ≈ a·u, with a taken from the previous iterate
+  • A short explicit predictor is used only to initialise the boundary values
+
+Properties:
+  • Unconditionally stable with respect to the diffusion CFL condition
+  • Numerical damping of fast transients (typical of Backward Euler)
+  • Nonlinearity confined to boundary treatment; interior remains linear
+
 """
 
 from __future__ import annotations
@@ -27,15 +50,19 @@ def BE(**kwargs: Any) -> dict[str, Any]:
     Γ_in + D ∂u/∂x|_0 - k_u u(0)² = 0,  -D ∂u/∂x|_L - k_d u(L)² = 0.
 
     Defaults come from permeation.materials.parameters(); pass any key to override
-    (e.g. Nx, Nt, T, D, L, ku, kd, ks, G, I, Uinit, PLOT, ncorrection). Tend and saveU
+    (e.g. Nx, Nt, T, D, L, ku, kd, ks, G, I, Uinit, ncorrection). Tend, saveU, PLOT
     are accepted but not used by the solver.
 
     Returns
     -------
     dict
-        "fluxes" : DataFrame with columns time, rel (inlet), perm (outlet)
-        "c" : (Nt+1, Nx+1) concentration history
-        "calctime" : float, seconds
+        x : (Nx+1,) spatial grid [m]
+        time : (Nt+1,) time grid [s]
+        c : (Nt+1, Nx+1) concentration history
+        fluxes : DataFrame with columns time, rel (inlet), perm (outlet)
+        params : resolved parameter dict used in the run (includes dx, dt, modified ku/kd)
+        calctime : float, seconds
+        pdp : (Nt+1,) outlet flux (alias for fluxes["perm"])
     """
     params = default_parameters()
     params.update(kwargs)
@@ -50,7 +77,6 @@ def BE(**kwargs: Any) -> dict[str, Any]:
     G = params["G"]
     I = params["I"]
     Uinit = params["Uinit"]
-    PLOT = params["PLOT"]
     ncorrection = params["ncorrection"]
 
     # Platform-specific factor for TMAP7 agreement (H2 -> 2H interpretation)
@@ -62,12 +88,31 @@ def BE(**kwargs: Any) -> dict[str, Any]:
         G = np.zeros(Nt + 1)
     G = G * ks
     if np.any(G < 0):
+        t_arr = np.linspace(0, T, Nt + 1)
+        x_arr = np.linspace(0, L, Nx + 1)
+        dx = L / Nx
+        dt = T / Nt
+        resolved = {
+            "Nx": Nx,
+            "Nt": Nt,
+            "T": T,
+            "D": D,
+            "L": L,
+            "ku": ku,
+            "kd": kd,
+            "ks": ks,
+            "ncorrection": ncorrection,
+            "dx": dx,
+            "dt": dt,
+        }
         return {
-            "time": np.linspace(0, T, Nt + 1),
-            "pdp": np.zeros(Nt + 1),
-            "fluxes": pd.DataFrame({"time": np.linspace(0, T, Nt + 1), "rel": 0.0, "perm": 0.0}),
+            "x": x_arr,
+            "time": t_arr,
             "c": np.zeros((Nt + 1, Nx + 1)),
+            "fluxes": pd.DataFrame({"time": t_arr, "rel": 0.0, "perm": 0.0}),
+            "params": resolved,
             "calctime": 0.0,
+            "pdp": np.zeros(Nt + 1),
         }
 
     t0 = time.perf_counter()
@@ -90,11 +135,6 @@ def BE(**kwargs: Any) -> dict[str, Any]:
     Usave = np.zeros((Nt + 1, Nx + 1), dtype=float)
     Usave[0] = u_1
 
-    if PLOT:
-        import matplotlib.pyplot as plt
-        plt.plot(x / 1e-6, u_1, "k-", lw=4)
-    color_idx = np.linspace(0, 1, Nt)
-
     for n in range(Nt):
         # Explicit guess for boundary neighbours (equations 3.2, 3.3)
         g0 = F * u_1[0] + (1 - 2 * F) * u_1[1] + F * u_1[2]
@@ -111,11 +151,16 @@ def BE(**kwargs: Any) -> dict[str, Any]:
             format="csr",
         )
         # RHS: quadratic roots for boundaries, interior = u_1
-        b = np.concatenate([
-            [-teta1 / 2.0 + 0.5 * np.sqrt(teta1**2 + 4 * teta1 * g0 + 4 * G[n] / ku)],
-            u_1[1:Nx],
-            [-teta2 / 2.0 + 0.5 * np.sqrt(teta2**2 + 4 * teta2 * gL)],
-        ])
+        b = np.concatenate(
+            [
+                [
+                    -teta1 / 2.0
+                    + 0.5 * np.sqrt(teta1**2 + 4 * teta1 * g0 + 4 * G[n] / ku)
+                ],
+                u_1[1:Nx],
+                [-teta2 / 2.0 + 0.5 * np.sqrt(teta2**2 + 4 * teta2 * gL)],
+            ]
+        )
         u[:] = spsolve(A, b)
 
         # Iterative correction: linearise u² as u·a (a = previous u)
@@ -124,7 +169,9 @@ def BE(**kwargs: Any) -> dict[str, Any]:
             A = diags(
                 diagonals=[
                     [-D / dx] + [-F] * (Nx - 1),
-                    [D / dx + ku * a0] + [1.0 + 2.0 * F] * (Nx - 1) + [D / dx + kd * aL],
+                    [D / dx + ku * a0]
+                    + [1.0 + 2.0 * F] * (Nx - 1)
+                    + [D / dx + kd * aL],
                     [-F] * (Nx - 1) + [-D / dx],
                 ],
                 offsets=[1, 0, -1],
@@ -137,27 +184,29 @@ def BE(**kwargs: Any) -> dict[str, Any]:
         u_1, u = u, u_1
         inlet.append(float(ku * u_1[0] ** 2))
         outlet.append(float(kd * u_1[Nx] ** 2))
-        if PLOT:
-            import matplotlib.pyplot as plt
-            plt.plot(x / 1e-6, u_1, ".-", color=plt.cm.jet(float(color_idx[n])))
         Usave[n + 1] = u_1
-
-    if PLOT:
-        import matplotlib.pyplot as plt
-        font = {"family": "serif", "weight": "normal", "size": 12}
-        plt.rc("font", **font)
-        plt.rcParams.update({"mathtext.default": "regular"})
-        ax = plt.gca()
-        ax.set_xlim(0, L / 1e-6)
-        ax.set_xlabel(r"x ($\mu$m)")
-        ax.set_ylabel("concentration (m$^{-3}$)")
 
     elapsed = time.perf_counter() - t0
     fluxes_df = pd.DataFrame({"time": t, "rel": inlet, "perm": outlet})
+    resolved = {
+        "Nx": Nx,
+        "Nt": Nt,
+        "T": T,
+        "D": D,
+        "L": L,
+        "ku": ku,
+        "kd": kd,
+        "ks": ks,
+        "ncorrection": ncorrection,
+        "dx": dx,
+        "dt": dt,
+    }
     return {
-        "fluxes": fluxes_df,
-        "c": Usave,
-        "calctime": elapsed,
+        "x": x,
         "time": t,
+        "c": Usave,
+        "fluxes": fluxes_df,
+        "params": resolved,
+        "calctime": elapsed,
         "pdp": np.array(outlet),
     }

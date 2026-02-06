@@ -9,61 +9,26 @@ from __future__ import annotations
 
 import os
 import time
-from typing import Any, Callable
+from typing import Any
 
 import numpy as np
 import pandas as pd
 from scipy.sparse import diags
 from scipy.sparse.linalg import spsolve
 
+from permeation.materials import parameters as default_parameters
 
-def BE(
-    Nx: int = 30,
-    Nt: int = 100,
-    T: float = 100.0,
-    D: float = 1.1e-8,
-    L: float = 2e-5,
-    ku: float = 1e-33,
-    kd: float = 1e-33,
-    ks: float = 1e16,
-    G: np.ndarray | None = None,
-    I: Callable[[float], float] | None = None,
-    Uinit: np.ndarray | None = None,
-    PLOT: bool = False,
-    saveU: str | None = None,
-    ncorrection: int = 3,
-    **kwargs: Any,
-) -> dict[str, Any]:
+
+def BE(**kwargs: Any) -> dict[str, Any]:
     """
     Backward Euler step for permeation: ∂u/∂t = D ∂²u/∂x² with flux/recombination BCs.
 
     Boundary conditions (upstream x=0, downstream x=L):
     Γ_in + D ∂u/∂x|_0 - k_u u(0)² = 0,  -D ∂u/∂x|_L - k_d u(L)² = 0.
 
-    Parameters
-    ----------
-    Nx, Nt : int
-        Space and time mesh points (interior + boundaries).
-    T : float
-        End time [s].
-    D : float
-        Diffusion coefficient [m²/s].
-    L : float
-        Membrane thickness [m].
-    ku, kd : float
-        Upstream and downstream recombination coefficients.
-    ks : float
-        Scale for incident flux (G is multiplied by ks).
-    G : array of shape (Nt+1,)
-        Incident flux (dimensionless before scaling).
-    I : callable, optional
-        Initial concentration profile u(x); if None, Uinit is used.
-    Uinit : array of shape (Nx+1,), optional
-        Initial concentration; used if I is None.
-    PLOT : bool
-        If True, matplotlib is used to plot concentration evolution (not in API guarantee).
-    saveU, ncorrection : optional
-        saveU unused in this implementation; ncorrection = number of BC correction iterations.
+    Defaults come from permeation.materials.parameters(); pass any key to override
+    (e.g. Nx, Nt, T, D, L, ku, kd, ks, G, I, Uinit, PLOT, ncorrection). Tend and saveU
+    are accepted but not used by the solver.
 
     Returns
     -------
@@ -72,6 +37,22 @@ def BE(
         "c" : (Nt+1, Nx+1) concentration history
         "calctime" : float, seconds
     """
+    params = default_parameters()
+    params.update(kwargs)
+    Nx = params["Nx"]
+    Nt = params["Nt"]
+    T = params["T"]
+    D = params["D"]
+    L = params["L"]
+    ku = params["ku"]
+    kd = params["kd"]
+    ks = params["ks"]
+    G = params["G"]
+    I = params["I"]
+    Uinit = params["Uinit"]
+    PLOT = params["PLOT"]
+    ncorrection = params["ncorrection"]
+
     # Platform-specific factor for TMAP7 agreement (H2 -> 2H interpretation)
     if os.name == "nt":
         ku = 2.0 * ku

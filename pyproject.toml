@@ -23,5 +23,14 @@ docs = [
   "mkdocs-glightbox"
 ]
 
+dev = [
+  "jupyterlab>=4.0",
+  "ipykernel>=6.0",
+  "matplotlib>=3.5",
+  "pytest>=7.0",
+  "black>=23.0",
+  "plotly>=5.18"
+]
+
 [tool.setuptools.packages.find]
 where = ["src"]

@@ -29,7 +29,8 @@ dev = [
   "matplotlib>=3.5",
   "pytest>=7.0",
   "black>=23.0",
-  "plotly>=5.18"
+  "plotly>=5.18",
+  "tqdm>=4.67.1"
 ]
 
 [tool.setuptools.packages.find]

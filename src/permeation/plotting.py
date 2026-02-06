@@ -115,3 +115,71 @@ def plot_fluxes(
     if savepath:
         ax.get_figure().savefig(savepath, bbox_inches="tight")
     return ax
+
+
+def plot_concentration_3d(
+    result: dict[str, Any],
+    ax: Any = None,
+    cmap: str = "inferno",
+    figsize: Sequence[float] = (12, 8),
+    savepath: str | None = None,
+) -> Any:
+    """
+    Plot concentration profile time evolution as a 3D surface.
+
+    Surface: x = position (µm), y = time (s), z = concentration scaled by 10^pwr
+    so the z-axis label is "c, 10^{pwr} H/m³".
+
+    Parameters
+    ----------
+    result : dict
+        Solver output from BE() with keys "x", "time", "c".
+    ax : matplotlib 3D axes, optional
+        Axes to plot on; if None, create a new figure with 3D projection.
+    cmap : str, optional
+        Colormap name for the surface (default "inferno").
+    figsize : sequence of float, optional
+        (width, height) in inches when creating a new figure (default (12, 8)).
+    savepath : str, optional
+        If set, save the figure to this path with bbox_inches="tight".
+
+    Returns
+    -------
+    matplotlib 3D axes
+    """
+    import matplotlib.pyplot as plt
+    from matplotlib import cm as mpl_cm
+
+    x = np.asarray(result["x"])
+    t = np.asarray(result["time"])
+    c = np.asarray(result["c"], dtype=float)
+    x_um = x / 1e-6
+    X, Y = np.meshgrid(x_um, t)
+
+    c_max = float(np.max(c))
+    pwr = int(np.round(np.log10(c_max))) if c_max > 0 else 0
+    scale = 10.0 ** pwr
+    a = c / scale if scale > 0 else c
+
+    if ax is None:
+        fig = plt.figure(figsize=figsize)
+        ax = fig.add_subplot(111, projection="3d")
+
+    cmap_obj = mpl_cm.get_cmap(cmap)
+    surf = ax.plot_surface(
+        X, Y, a,
+        cmap=cmap_obj,
+        vmin=0.0,
+        vmax=np.max(a) if a.size else 1.0,
+        edgecolor="C2",
+        linewidth=0.2,
+    )
+    surf.set_facecolor((0, 0, 0, 0))
+    ax.get_figure().colorbar(surf, shrink=0.6, aspect=10)
+    ax.view_init(25, 40)
+    ax.set_xlabel("d (µm)", labelpad=15)
+    ax.set_ylabel("time (s)", labelpad=20)
+    ax.set_zlabel(f"c, $10^{{{pwr}}}$ H/m³", labelpad=15)
+    if savepath:
+        ax.get_figure().savefig(savepath, bbox_inches="tight")
+    return ax

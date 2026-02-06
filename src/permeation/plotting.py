@@ -205,24 +205,44 @@ def plot_summary(
         figure=fig,
         width_ratios=(1.0, 1.4, 0.06),   # left / 3D / colorbar
         height_ratios=(1.0, 1.0),
-        wspace=0.25,
-        hspace=0.35,
+        wspace=0.4,
+        hspace=0.45,
     )
 
     ax_flux = fig.add_subplot(gs[0, 0])
     ax_prof = fig.add_subplot(gs[1, 0])
     ax_3d   = fig.add_subplot(gs[:, 1], projection="3d")
-    cax     = fig.add_subplot(gs[:, 2])
+
 
     # --- Fluxes ---
-    plot_fluxes(result, ax=ax_flux)
-
-    # --- Profiles ---
-    plot_profiles(result, time_idx=profile_time_idx, ax=ax_prof)
+    fluxes = result["fluxes"]
+    flux_max = float(np.nanmax(np.abs([fluxes["rel"].max(), fluxes["perm"].max()])))
+    flux_pwr = int(np.floor(np.log10(flux_max))) if flux_max > 0 else 0
+    flux_scale = 10.0 ** flux_pwr
+    fluxes_scaled = fluxes.copy()
+    if flux_scale > 0:
+        fluxes_scaled["rel"] = fluxes_scaled["rel"] / flux_scale
+        fluxes_scaled["perm"] = fluxes_scaled["perm"] / flux_scale
+    plot_fluxes({**result, "fluxes": fluxes_scaled}, ax=ax_flux)
+    ax_flux.legend(
+        loc="lower left",
+        bbox_to_anchor=(0.0, 1.02),
+        frameon=False,
+        borderaxespad=0.0,
+    )
+    ax_flux.set_ylabel(f"flux × 10^{flux_pwr} (m⁻² s⁻¹)")
 
     x = np.asarray(result["x"]) / 1e-6
     t = np.asarray(result["time"])
     c = np.asarray(result["c"])
+
+    # --- Profiles ---
+    prof_max = float(np.nanmax(np.abs(c))) if c.size else 0.0
+    prof_pwr = int(np.floor(np.log10(prof_max))) if prof_max > 0 else 0
+    prof_scale = 10.0 ** prof_pwr
+    c_scaled = c / prof_scale if prof_scale > 0 else c
+    plot_profiles({**result, "c": c_scaled}, time_idx=profile_time_idx, ax=ax_prof)
+    ax_prof.set_ylabel(f"concentration × 10^{prof_pwr} (m⁻³)")
 
     # --- 3D surface ---
     X, Y = np.meshgrid(x, t)
@@ -240,11 +260,38 @@ def plot_summary(
     ax_3d.view_init(25, 40)
     ax_3d.set_xlabel("d (µm)", labelpad=12)
     ax_3d.set_ylabel("time (s)", labelpad=12)
-    ax_3d.set_zlabel(f"c × 10^{pwr} (H/m³)", labelpad=10)
+    ax_3d.zaxis.set_rotate_label(False)
+    ax_3d.set_zlabel(f"c × 10^{pwr} (H/m³)", labelpad=10, rotation=90)
 
-    # --- Colorbar (explicit axis!) ---
-    cb = fig.colorbar(surf, cax=cax)
-    cb.set_label("scaled concentration")
+    # --- panel labels ---
+    ax_flux.text(
+        -0.1,
+        1.1,
+        "a.",
+        transform=ax_flux.transAxes,
+        ha="left",
+        va="top",
+        fontweight="bold",
+    )
+    ax_prof.text(
+        -0.1,
+        1.1,
+        "b.",
+        transform=ax_prof.transAxes,
+        ha="left",
+        va="top",
+        fontweight="bold",
+    )
+    ax_3d.text2D(
+        0.02,
+        0.98,
+        "c.",
+        transform=ax_3d.transAxes,
+        ha="left",
+        va="top",
+        fontweight="bold",
+    )
+
 
     if savepath:
         fig.savefig(savepath, bbox_inches="tight")

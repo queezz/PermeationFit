@@ -11,26 +11,28 @@
       
       
       
+        <link rel="prev" href="../..">
       
-        <link rel="next" href="theory/backward-euler/">
+      
+        <link rel="next" href="../diffusion/">
       
       
         
       
       
-      <link rel="icon" href="assets/images/favicon.png">
+      <link rel="icon" href="../../assets/images/favicon.png">
       <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.1">
     
     
       
-        <title>Permeation</title>
+        <title>Backward Euler - Permeation</title>
       
     
     
-      <link rel="stylesheet" href="assets/stylesheets/main.484c7ddc.min.css">
+      <link rel="stylesheet" href="../../assets/stylesheets/main.484c7ddc.min.css">
       
         
-        <link rel="stylesheet" href="assets/stylesheets/palette.ab4e12ef.min.css">
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.ab4e12ef.min.css">
       
       
 
@@ -49,9 +51,9 @@
       
     
     
-      <link rel="stylesheet" href="styles/brand.css">
+      <link rel="stylesheet" href="../../styles/brand.css">
     
-    <script>__md_scope=new URL(".",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
     
       
 
@@ -76,7 +78,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#hydrogen-permeation" class="md-skip">
+        <a href="#backward-euler-diffusion-solver-be" class="md-skip">
           Skip to content
         </a>
       
@@ -90,7 +92,7 @@
 
 <header class="md-header" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="." title="Permeation" class="md-header__button md-logo" aria-label="Permeation" data-md-component="logo">
+    <a href="../.." title="Permeation" class="md-header__button md-logo" aria-label="Permeation" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
@@ -110,7 +112,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              🏠 Home
+              Backward Euler
             
           </span>
         </div>
@@ -219,11 +221,9 @@
   
   
   
-    
   
-  
-    <li class="md-tabs__item md-tabs__item--active">
-      <a href="." class="md-tabs__link">
+    <li class="md-tabs__item">
+      <a href="../.." class="md-tabs__link">
         
   
   
@@ -240,11 +240,13 @@
   
   
   
+    
+  
   
     
     
-      <li class="md-tabs__item">
-        <a href="theory/backward-euler/" class="md-tabs__link">
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="./" class="md-tabs__link">
           
   
   
@@ -264,7 +266,7 @@
     
     
       <li class="md-tabs__item">
-        <a href="reference/history/" class="md-tabs__link">
+        <a href="../../reference/history/" class="md-tabs__link">
           
   
   
@@ -298,7 +300,7 @@
 
 <nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="." title="Permeation" class="md-nav__button md-logo" aria-label="Permeation" data-md-component="logo">
+    <a href="../.." title="Permeation" class="md-nav__button md-logo" aria-label="Permeation" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
@@ -325,6 +327,88 @@
       
   
   
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    🏠 Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    🧠 Theory
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    🧠 Theory
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
     
   
   
@@ -344,7 +428,7 @@
   <span class="md-ellipsis">
     
   
-    🏠 Home
+    Backward Euler
   
 
     
@@ -355,14 +439,14 @@
           <span class="md-nav__icon md-icon"></span>
         </label>
       
-      <a href="." class="md-nav__link md-nav__link--active">
+      <a href="./" class="md-nav__link md-nav__link--active">
         
   
   
   <span class="md-ellipsis">
     
   
-    🏠 Home
+    Backward Euler
   
 
     
@@ -388,54 +472,150 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#whats-inside" class="md-nav__link">
+  <a href="#time-integration" class="md-nav__link">
     <span class="md-ellipsis">
       
-        What’s inside
+        Time integration
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Time integration">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#backward-euler" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Backward Euler
       
     </span>
   </a>
   
 </li>
+        
+      </ul>
+    </nav>
+  
+</li>
       
         <li class="md-nav__item">
-  <a href="#what-this-is-not" class="md-nav__link">
+  <a href="#spatial-discretisation" class="md-nav__link">
     <span class="md-ellipsis">
       
-        What this is not
+        Spatial discretisation
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Spatial discretisation">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#central-finite-differences" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Central finite differences
       
     </span>
   </a>
   
 </li>
+        
+      </ul>
+    </nav>
+  
+</li>
       
         <li class="md-nav__item">
-  <a href="#documentation-map" class="md-nav__link">
+  <a href="#linear-system-solution" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Documentation map
+        Linear system solution
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Linear system solution">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#sparse-tridiagonal-system" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Sparse tridiagonal system
       
     </span>
   </a>
   
 </li>
+        
+      </ul>
+    </nav>
+  
+</li>
       
         <li class="md-nav__item">
-  <a href="#references" class="md-nav__link">
+  <a href="#boundary-conditions" class="md-nav__link">
     <span class="md-ellipsis">
       
-        References
+        Boundary conditions
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Boundary conditions">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#nonlinear-recombination-boundary-conditions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Nonlinear recombination boundary conditions
       
     </span>
   </a>
   
 </li>
+        
+      </ul>
+    </nav>
+  
+</li>
       
         <li class="md-nav__item">
-  <a href="#why-mkdocs" class="md-nav__link">
+  <a href="#nonlinear-treatment" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Why MkDocs
+        Nonlinear treatment
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Nonlinear treatment">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#picard-fixed-point-iteration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Picard (fixed-point) iteration
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#notes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Notes
       
     </span>
   </a>
@@ -449,83 +629,6 @@
     </li>
   
 
-    
-      
-      
-  
-  
-  
-  
-    
-    
-    
-    
-      
-      
-    
-    
-    <li class="md-nav__item md-nav__item--nested">
-      
-        
-        
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
-        
-          
-          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
-            
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    🧠 Theory
-  
-
-    
-  </span>
-  
-  
-
-            <span class="md-nav__icon md-icon"></span>
-          </label>
-        
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_2">
-            <span class="md-nav__icon md-icon"></span>
-            
-  
-    🧠 Theory
-  
-
-          </label>
-          <ul class="md-nav__list" data-md-scrollfix>
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="theory/backward-euler/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Backward Euler
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
               
             
               
@@ -535,7 +638,7 @@
   
   
     <li class="md-nav__item">
-      <a href="theory/diffusion/" class="md-nav__link">
+      <a href="../diffusion/" class="md-nav__link">
         
   
   
@@ -563,7 +666,7 @@
   
   
     <li class="md-nav__item">
-      <a href="theory/finite-methods/" class="md-nav__link">
+      <a href="../finite-methods/" class="md-nav__link">
         
   
   
@@ -648,7 +751,7 @@
   
   
     <li class="md-nav__item">
-      <a href="reference/history/" class="md-nav__link">
+      <a href="../../reference/history/" class="md-nav__link">
         
   
   
@@ -676,7 +779,7 @@
   
   
     <li class="md-nav__item">
-      <a href="reference/notation/" class="md-nav__link">
+      <a href="../../reference/notation/" class="md-nav__link">
         
   
   
@@ -704,7 +807,7 @@
   
   
     <li class="md-nav__item">
-      <a href="reference/equations/" class="md-nav__link">
+      <a href="../../reference/equations/" class="md-nav__link">
         
   
   
@@ -759,54 +862,150 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#whats-inside" class="md-nav__link">
+  <a href="#time-integration" class="md-nav__link">
     <span class="md-ellipsis">
       
-        What’s inside
+        Time integration
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Time integration">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#backward-euler" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Backward Euler
       
     </span>
   </a>
   
 </li>
+        
+      </ul>
+    </nav>
+  
+</li>
       
         <li class="md-nav__item">
-  <a href="#what-this-is-not" class="md-nav__link">
+  <a href="#spatial-discretisation" class="md-nav__link">
     <span class="md-ellipsis">
       
-        What this is not
+        Spatial discretisation
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Spatial discretisation">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#central-finite-differences" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Central finite differences
       
     </span>
   </a>
   
 </li>
+        
+      </ul>
+    </nav>
+  
+</li>
       
         <li class="md-nav__item">
-  <a href="#documentation-map" class="md-nav__link">
+  <a href="#linear-system-solution" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Documentation map
+        Linear system solution
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Linear system solution">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#sparse-tridiagonal-system" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Sparse tridiagonal system
       
     </span>
   </a>
   
 </li>
+        
+      </ul>
+    </nav>
+  
+</li>
       
         <li class="md-nav__item">
-  <a href="#references" class="md-nav__link">
+  <a href="#boundary-conditions" class="md-nav__link">
     <span class="md-ellipsis">
       
-        References
+        Boundary conditions
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Boundary conditions">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#nonlinear-recombination-boundary-conditions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Nonlinear recombination boundary conditions
       
     </span>
   </a>
   
 </li>
+        
+      </ul>
+    </nav>
+  
+</li>
       
         <li class="md-nav__item">
-  <a href="#why-mkdocs" class="md-nav__link">
+  <a href="#nonlinear-treatment" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Why MkDocs
+        Nonlinear treatment
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Nonlinear treatment">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#picard-fixed-point-iteration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Picard (fixed-point) iteration
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#notes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Notes
       
     </span>
   </a>
@@ -833,89 +1032,99 @@
   
 
 
-<h1 id="hydrogen-permeation">Hydrogen permeation<a class="headerlink" href="#hydrogen-permeation" title="Permanent link">&para;</a></h1>
-<p>Simple numerical diffusion models in Python.</p>
-<p>This repository is a <strong>small Python package plus examples</strong> for solving the 1D hydrogen diffusion / permeation problem in a metal membrane.</p>
-<p>It started as a LaTeX note collection and gradually turned into runnable code.<br />
-Now it’s documented with <strong>MkDocs</strong> and focuses on <strong>practical use + minimal theory</strong>.</p>
-<p>The goal here is not to be exhaustive or perfectly general, but to provide:</p>
-<ul>
-<li>working numerical schemes,</li>
-<li>clear assumptions,</li>
-<li>and examples that are easy to modify.</li>
-</ul>
-<p>If you need a fast way to <em>run</em> a permeation model and understand what the code is doing, this is for you.</p>
+<h1 id="backward-euler-diffusion-solver-be">Backward Euler diffusion solver (BE)<a class="headerlink" href="#backward-euler-diffusion-solver-be" title="Permanent link">&para;</a></h1>
+<p>This page documents the numerical method used in the <strong>Backward Euler (BE)</strong>
+permeation solver implemented in this project.<br />
+It serves as a <strong>reference anchor</strong> for the solver design, terminology, and
+implementation choices.</p>
+<p>Derivations, stencil diagrams, and visualizations will be added later.</p>
 <hr />
-<h2 id="whats-inside">What’s inside<a class="headerlink" href="#whats-inside" title="Permanent link">&para;</a></h2>
+<h2 id="time-integration">Time integration<a class="headerlink" href="#time-integration" title="Permanent link">&para;</a></h2>
+<h3 id="backward-euler">Backward Euler<a class="headerlink" href="#backward-euler" title="Permanent link">&para;</a></h3>
 <ul>
-<li>
-<p><strong>1D diffusion equation</strong> for hydrogen in a flat membrane<br />
-  (no traps, no bulk reactions — the baseline case)</p>
-</li>
-<li>
-<p><strong>Finite-difference schemes</strong></p>
-</li>
-<li>explicit stencils (for intuition)</li>
-<li>
-<p>implicit schemes (Backward Euler, Crank–Nicolson–style grids)</p>
-</li>
-<li>
-<p><strong>Python implementations</strong></p>
-</li>
-<li>NumPy / SciPy for arrays and sparse solvers</li>
-<li>
-<p>structured so you can swap parameters and boundary conditions easily</p>
-</li>
-<li>
-<p><strong>Examples</strong></p>
-</li>
-<li>how to run a simulation</li>
-<li>how to extract permeation flux</li>
-<li>how numerical choices affect stability and speed</li>
+<li><strong>Type:</strong> fully implicit, first-order in time</li>
+<li><strong>Used for:</strong> time integration of the diffusion equation</li>
 </ul>
-<p>This is intentionally <strong>example-driven</strong>, not framework-heavy.</p>
-<hr />
-<h2 id="what-this-is-not">What this is <em>not</em><a class="headerlink" href="#what-this-is-not" title="Permanent link">&para;</a></h2>
+<p>The diffusion equation is discretised in time as:</p>
+<div class="arithmatex">\[
+\frac{u^{n+1} - u^n}{\Delta t}
+=
+D \frac{\partial^2 u^{n+1}}{\partial x^2}
+\]</div>
+<p>This leads to a linear system of the form:</p>
+<div class="arithmatex">\[
+(I - \Delta t\,D\,L)\,u^{n+1} = u^n
+\]</div>
+<p>where <span class="arithmatex">\(L\)</span> is the discrete Laplacian operator, and <span class="arithmatex">\(I\)</span> is identity operatro, see <a href="../../reference/notation/#operators-and-matrices">notation</a></p>
+<p><strong>References</strong></p>
 <ul>
-<li>Not a polished simulation framework</li>
-<li>Not a benchmark against every solver under the sun</li>
-<li>Not a review article</li>
-</ul>
-<p>If you need traps, multiple species, or full thermo-kinetics — this code is meant to be a <strong>starting point</strong>, not the final word.</p>
-<hr />
-<h2 id="documentation-map">Documentation map<a class="headerlink" href="#documentation-map" title="Permanent link">&para;</a></h2>
-<ul>
-<li>
-<p><a href="theory/diffusion/">Diffusion equation</a><br />
-  Governing PDE and boundary conditions used here</p>
-</li>
-<li>
-<p><a href="theory/finite-methods/">Finite difference methods</a><br />
-  Grid setup, stencils, and stability notes</p>
-</li>
-<li>
-<p><a href="reference/equations/">Equation cheat sheet</a><br />
-  Stencils, coefficients, and σ definitions used in the code</p>
-</li>
+<li><a href="https://en.wikipedia.org/wiki/Backward_Euler_method" target="_blank">Backward Euler method</a></li>
+<li><a href="https://en.wikipedia.org/wiki/Implicit_method" target="_blank">Implicit methods</a></li>
 </ul>
 <hr />
-<h2 id="references">References<a class="headerlink" href="#references" title="Permanent link">&para;</a></h2>
-<p>This package does <strong>not</strong> attempt to reproduce or follow the full body of hydrogen
-transport theory and simulation developed over the last decades.</p>
-<p>Instead, it implements a <strong>minimal recombination–diffusion model</strong> as a clean,
-transparent starting point — something that is easy to read, run, and modify.</p>
-<p>That said, it sits within a much broader historical and methodological context,
-which is worth being aware of: <a href="reference/history/">A bit of history</a>. </p>
-<h2 id="why-mkdocs">Why MkDocs<a class="headerlink" href="#why-mkdocs" title="Permanent link">&para;</a></h2>
-<p><em>(and not LaTeX)</em></p>
-<p>LaTeX was great for derivations.<br />
-MkDocs is better for:</p>
+<h2 id="spatial-discretisation">Spatial discretisation<a class="headerlink" href="#spatial-discretisation" title="Permanent link">&para;</a></h2>
+<h3 id="central-finite-differences">Central finite differences<a class="headerlink" href="#central-finite-differences" title="Permanent link">&para;</a></h3>
 <ul>
-<li>code + explanation living together,</li>
-<li>quick edits,</li>
-<li>examples that actually run.</li>
+<li><strong>Grid:</strong> uniform, one-dimensional</li>
+<li><strong>Order:</strong> second-order accurate in space</li>
+<li><strong>Operator:</strong> three-point stencil for the second derivative</li>
 </ul>
-<p>The math hasn’t disappeared — it’s just no longer pretending to be a paper.</p>
+<p>Used to discretise the Laplacian in the diffusion equation.</p>
+<p><strong>References</strong></p>
+<ul>
+<li><a href="https://en.wikipedia.org/wiki/Finite_difference_method" target="_blank">Finite difference method</a></li>
+<li><a href="https://en.wikipedia.org/wiki/Discrete_Laplacian" target="_blank">Discrete Laplacian</a></li>
+</ul>
+<hr />
+<h2 id="linear-system-solution">Linear system solution<a class="headerlink" href="#linear-system-solution" title="Permanent link">&para;</a></h2>
+<h3 id="sparse-tridiagonal-system">Sparse tridiagonal system<a class="headerlink" href="#sparse-tridiagonal-system" title="Permanent link">&para;</a></h3>
+<p>Each time step requires solving a sparse tridiagonal linear system resulting
+from the implicit diffusion operator.</p>
+<ul>
+<li>Matrix assembly: <code>scipy.sparse.diags</code></li>
+<li>Linear solver: <code>scipy.sparse.linalg.spsolve</code></li>
+</ul>
+<p><strong>References</strong></p>
+<ul>
+<li><a href="https://docs.scipy.org/doc/scipy/reference/sparse.html" target="_blank">SciPy sparse matrices</a></li>
+<li><a href="https://en.wikipedia.org/wiki/Tridiagonal_matrix_algorithm" target="_blank">Tridiagonal matrix algorithm</a></li>
+</ul>
+<hr />
+<h2 id="boundary-conditions">Boundary conditions<a class="headerlink" href="#boundary-conditions" title="Permanent link">&para;</a></h2>
+<h3 id="nonlinear-recombination-boundary-conditions">Nonlinear recombination boundary conditions<a class="headerlink" href="#nonlinear-recombination-boundary-conditions" title="Permanent link">&para;</a></h3>
+<p>At the upstream and downstream boundaries, the flux depends quadratically on
+the local concentration:</p>
+<div class="arithmatex">\[
+\Gamma \propto u^2
+\]</div>
+<p>This introduces nonlinearity only at the boundaries; the interior diffusion
+equation remains linear.</p>
+<hr />
+<h2 id="nonlinear-treatment">Nonlinear treatment<a class="headerlink" href="#nonlinear-treatment" title="Permanent link">&para;</a></h2>
+<h3 id="picard-fixed-point-iteration">Picard (fixed-point) iteration<a class="headerlink" href="#picard-fixed-point-iteration" title="Permanent link">&para;</a></h3>
+<p>The nonlinear boundary terms are handled using Picard iteration:</p>
+<div class="arithmatex">\[
+u^2 \;\approx\; a \cdot u
+\]</div>
+<p>where the coefficient <span class="arithmatex">\(a\)</span> is taken from the previous iterate.<br />
+The resulting linear system is solved repeatedly until convergence.</p>
+<p>An explicit predictor is used only to initialise the boundary values before
+iteration.</p>
+<p><strong>References</strong></p>
+<ul>
+<li><a href="https://en.wikipedia.org/wiki/Picard_iteration" target="_blank">Picard iteration</a></li>
+<li><a href="https://en.wikipedia.org/wiki/Fixed-point_iteration" target="_blank">Fixed-point iteration</a></li>
+<li><a href="https://adamdjellouli.com/articles/numerical_methods/7_ordinary_differential_equations/picards_method" target="_blank">Picard's iteration method</a></li>
+</ul>
+<hr />
+<h2 id="notes">Notes<a class="headerlink" href="#notes" title="Permanent link">&para;</a></h2>
+<ul>
+<li>The scheme is unconditionally stable with respect to the diffusion CFL
+  condition.</li>
+<li>Numerical damping of fast transients is expected (typical for Backward Euler).</li>
+<li>Nonlinearity is confined to the boundary treatment.</li>
+</ul>
+<p>Stencil visualizations and convergence illustrations will be added later.</p>
 
 
 
@@ -965,12 +1174,12 @@ MkDocs is better for:</p>
     
       
       
-      <script id="__config" type="application/json">{"annotate": null, "base": ".", "features": ["navigation.instant", "navigation.tracking", "content.code.copy", "navigation.tabs", "content.image.zoom"], "search": "assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.instant", "navigation.tracking", "content.code.copy", "navigation.tabs", "content.image.zoom"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
     
     
-      <script src="assets/javascripts/bundle.79ae519e.min.js"></script>
+      <script src="../../assets/javascripts/bundle.79ae519e.min.js"></script>
       
-        <script src="javascripts/config.js"></script>
+        <script src="../../javascripts/config.js"></script>
       
         <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
       

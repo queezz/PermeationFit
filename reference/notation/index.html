@@ -11,10 +11,10 @@
       
       
       
-        <link rel="prev" href="../diffusion/">
+        <link rel="prev" href="../history/">
       
       
-        <link rel="next" href="../../reference/history/">
+        <link rel="next" href="../equations/">
       
       
         
@@ -25,7 +25,7 @@
     
     
       
-        <title>🧮 Finite difference methods - Permeation</title>
+        <title>🎶 Notation - Permeation</title>
       
     
     
@@ -78,7 +78,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#finite-difference-methods" class="md-skip">
+        <a href="#numerical-diffusion-notation-vocabulary" class="md-skip">
           Skip to content
         </a>
       
@@ -112,7 +112,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              🧮 Finite difference methods
+              🎶 Notation
             
           </span>
         </div>
@@ -240,13 +240,11 @@
   
   
   
-    
-  
   
     
     
-      <li class="md-tabs__item md-tabs__item--active">
-        <a href="../diffusion/" class="md-tabs__link">
+      <li class="md-tabs__item">
+        <a href="../../theory/backward-euler/" class="md-tabs__link">
           
   
   
@@ -262,11 +260,13 @@
   
   
   
+    
+  
   
     
     
-      <li class="md-tabs__item">
-        <a href="../../reference/history/" class="md-tabs__link">
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../history/" class="md-tabs__link">
           
   
   
@@ -354,6 +354,147 @@
       
   
   
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    🧠 Theory
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    🧠 Theory
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../theory/backward-euler/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Backward Euler
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../theory/diffusion/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    🌊 Diffusion equation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../theory/finite-methods/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    🧮 Finite difference methods
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
     
   
   
@@ -373,17 +514,17 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" checked>
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" checked>
         
           
-          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="">
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="">
             
   
   
   <span class="md-ellipsis">
     
   
-    🧠 Theory
+    📚 References
   
 
     
@@ -394,12 +535,12 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="true">
-          <label class="md-nav__title" for="__nav_2">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_3">
             <span class="md-nav__icon md-icon"></span>
             
   
-    🧠 Theory
+    📚 References
   
 
           </label>
@@ -412,14 +553,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../diffusion/" class="md-nav__link">
+      <a href="../history/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    🌊 Diffusion equation
+    🕰️ History
   
 
     
@@ -456,7 +597,7 @@
   <span class="md-ellipsis">
     
   
-    🧮 Finite difference methods
+    🎶 Notation
   
 
     
@@ -474,7 +615,7 @@
   <span class="md-ellipsis">
     
   
-    🧮 Finite difference methods
+    🎶 Notation
   
 
     
@@ -500,21 +641,155 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#the-cranknicolson-method" class="md-nav__link">
+  <a href="#symbols" class="md-nav__link">
     <span class="md-ellipsis">
       
-        The Crank–Nicolson method
+        Symbols
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Symbols">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#un" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        \( u^n \)
       
     </span>
   </a>
   
 </li>
-      
-        <li class="md-nav__item">
-  <a href="#grid-and-notation" class="md-nav__link">
+        
+          <li class="md-nav__item">
+  <a href="#delta-t" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Grid and notation
+        \( \Delta t \)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#d" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        \( D \)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#operators-and-matrices" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Operators and Matrices
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Operators and Matrices">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#i-identity-matrix" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        \( I \) — Identity matrix
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#l-discrete-laplacian" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        \( L \) — Discrete Laplacian
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#time-integration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Time Integration
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Time Integration">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#backward-euler-implicit" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Backward Euler (implicit)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#derived-parameters" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Derived Parameters
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Derived Parameters">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#r-dfracddelta-tdelta-x2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        \( r = \dfrac{D\,\Delta t}{\Delta x^2} \)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#notes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Notes
       
     </span>
   </a>
@@ -530,63 +805,6 @@
 
               
             
-          </ul>
-        </nav>
-      
-    </li>
-  
-
-    
-      
-      
-  
-  
-  
-  
-    
-    
-    
-    
-      
-      
-    
-    
-    <li class="md-nav__item md-nav__item--nested">
-      
-        
-        
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
-        
-          
-          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
-            
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    📚 References
-  
-
-    
-  </span>
-  
-  
-
-            <span class="md-nav__icon md-icon"></span>
-          </label>
-        
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_3">
-            <span class="md-nav__icon md-icon"></span>
-            
-  
-    📚 References
-  
-
-          </label>
-          <ul class="md-nav__list" data-md-scrollfix>
-            
               
                 
   
@@ -594,35 +812,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../reference/history/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    🕰️ History
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../reference/equations/" class="md-nav__link">
+      <a href="../equations/" class="md-nav__link">
         
   
   
@@ -677,21 +867,155 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#the-cranknicolson-method" class="md-nav__link">
+  <a href="#symbols" class="md-nav__link">
     <span class="md-ellipsis">
       
-        The Crank–Nicolson method
+        Symbols
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Symbols">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#un" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        \( u^n \)
       
     </span>
   </a>
   
 </li>
-      
-        <li class="md-nav__item">
-  <a href="#grid-and-notation" class="md-nav__link">
+        
+          <li class="md-nav__item">
+  <a href="#delta-t" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Grid and notation
+        \( \Delta t \)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#d" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        \( D \)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#operators-and-matrices" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Operators and Matrices
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Operators and Matrices">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#i-identity-matrix" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        \( I \) — Identity matrix
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#l-discrete-laplacian" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        \( L \) — Discrete Laplacian
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#time-integration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Time Integration
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Time Integration">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#backward-euler-implicit" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Backward Euler (implicit)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#derived-parameters" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Derived Parameters
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Derived Parameters">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#r-dfracddelta-tdelta-x2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        \( r = \dfrac{D\,\Delta t}{\Delta x^2} \)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#notes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Notes
       
     </span>
   </a>
@@ -718,40 +1042,66 @@
   
 
 
-<h1 id="finite-difference-methods">Finite difference methods<a class="headerlink" href="#finite-difference-methods" title="Permanent link">&para;</a></h1>
-<p>This section is adapted from the <a href="https://github.com/numerical-mooc/numerical-mooc">numerical-mooc</a> notebooks.</p>
-<h2 id="the-cranknicolson-method">The Crank–Nicolson method<a class="headerlink" href="#the-cranknicolson-method" title="Permanent link">&para;</a></h2>
-<p>The <a href="https://en.wikipedia.org/wiki/Crank%E2%80%93Nicolson_method">Crank–Nicolson method</a> is a finite difference scheme for the numerical integration of the heat equation and related PDEs. It is often used for reaction–diffusion systems in one space dimension:</p>
+<h1 id="numerical-diffusion-notation-vocabulary">Numerical Diffusion — Notation &amp; Vocabulary<a class="headerlink" href="#numerical-diffusion-notation-vocabulary" title="Permanent link">&para;</a></h1>
+<p>This page collects the basic symbols and operators used in the numerical
+solution of the diffusion equation, mainly in finite-difference form.</p>
+<hr />
+<h2 id="symbols">Symbols<a class="headerlink" href="#symbols" title="Permanent link">&para;</a></h2>
+<h3 id="un"><span class="arithmatex">\( u^n \)</span><a class="headerlink" href="#un" title="Permanent link">&para;</a></h3>
+<p>Discrete solution vector at time step <span class="arithmatex">\( n \)</span>.</p>
+<p>Represents the value of the field (e.g. temperature, concentration, density)
+at all spatial grid points at time <span class="arithmatex">\( t = n\,\Delta t \)</span>.</p>
+<hr />
+<h3 id="delta-t"><span class="arithmatex">\( \Delta t \)</span><a class="headerlink" href="#delta-t" title="Permanent link">&para;</a></h3>
+<p>Time step size.</p>
+<p>Controls the temporal resolution of the simulation.</p>
+<hr />
+<h3 id="d"><span class="arithmatex">\( D \)</span><a class="headerlink" href="#d" title="Permanent link">&para;</a></h3>
+<p>Diffusion coefficient.</p>
+<p>May be a scalar (constant diffusion) or a function of space, time, or state.</p>
+<hr />
+<h2 id="operators-and-matrices">Operators and Matrices<a class="headerlink" href="#operators-and-matrices" title="Permanent link">&para;</a></h2>
+<h3 id="i-identity-matrix"><span class="arithmatex">\( I \)</span> — Identity matrix<a class="headerlink" href="#i-identity-matrix" title="Permanent link">&para;</a></h3>
+<p>Identity operator in discrete space.</p>
+<p>Acts as:</p>
 <div class="arithmatex">\[
-\frac{\partial u}{\partial t} = D \frac{\partial^2 u}{\partial x^2} + f(u), \qquad
-\frac{\partial u}{\partial x}\bigg|_{x = 0, L} = 0
+I\,u = u
 \]</div>
-<p>Here <span class="arithmatex">\(u\)</span> is the concentration, <span class="arithmatex">\(x\)</span> is space, <span class="arithmatex">\(D\)</span> is the diffusion coefficient, <span class="arithmatex">\(f\)</span> is the reaction term, and <span class="arithmatex">\(L\)</span> is the length of the domain. The boundary conditions are <a href="https://en.wikipedia.org/wiki/Neumann_boundary_condition">Neumann</a> (zero flux at the boundaries).</p>
-<h2 id="grid-and-notation">Grid and notation<a class="headerlink" href="#grid-and-notation" title="Permanent link">&para;</a></h2>
-<p>Time and space are discretised as:</p>
+<p>In matrix form, <span class="arithmatex">\( I \)</span> has ones on the diagonal and zeros elsewhere.
+It appears when time-derivative terms are written in operator form.</p>
+<hr />
+<h3 id="l-discrete-laplacian"><span class="arithmatex">\( L \)</span> — Discrete Laplacian<a class="headerlink" href="#l-discrete-laplacian" title="Permanent link">&para;</a></h3>
+<p>Matrix representation of the spatial Laplacian operator <span class="arithmatex">\( \nabla^2 \)</span>.</p>
+<p>Obtained by discretising second spatial derivatives using finite differences
+(or finite volumes / finite elements).</p>
+<p>In 1D (uniform grid), <span class="arithmatex">\( L \)</span> is tridiagonal.</p>
+<hr />
+<h2 id="time-integration">Time Integration<a class="headerlink" href="#time-integration" title="Permanent link">&para;</a></h2>
+<h3 id="backward-euler-implicit">Backward Euler (implicit)<a class="headerlink" href="#backward-euler-implicit" title="Permanent link">&para;</a></h3>
+<p>Time discretisation:</p>
 <div class="arithmatex">\[
-t_n = n \Delta t, \quad n = 0, \ldots, N-1
+\frac{u^{n+1} - u^n}{\Delta t} = D\,L\,u^{n+1}
 \]</div>
+<p>Leads to the linear system:</p>
 <div class="arithmatex">\[
-x_j = j \Delta x, \quad j = 0, \ldots, J-1
+\left( I - \Delta t\,D\,L \right) u^{n+1} = u^n
 \]</div>
-<p>with <span class="arithmatex">\(\Delta t = T/N\)</span> and <span class="arithmatex">\(\Delta x = L/J\)</span>. We write <span class="arithmatex">\(U_j^n = U(j\Delta x, n\Delta t)\)</span> and define <span class="arithmatex">\(\sigma = \frac{D \Delta t}{2 \Delta x^2}\)</span>. The Crank–Nicolson scheme for the reaction–diffusion equation is:</p>
-<div class="arithmatex">\[
--\sigma U_{j-1}^{n+1} + (1+2\sigma) U_j^{n+1} -\sigma U_{j+1}^{n+1} = \sigma U_{j-1}^n + (1-2\sigma) U_j^n + \sigma U_{j+1}^n + \Delta t f(U_j^n)
-\]</div>
-<p>for <span class="arithmatex">\(j = 1,\ldots,J-2\)</span>. At the boundaries <span class="arithmatex">\(j=0\)</span> and <span class="arithmatex">\(j=J-1\)</span> the values <span class="arithmatex">\(U_{-1}^n\)</span> and <span class="arithmatex">\(U_J^n\)</span> are defined by the Neumann conditions (backward difference at <span class="arithmatex">\(j=0\)</span>, forward at <span class="arithmatex">\(j=J-1\)</span>):</p>
-<div class="arithmatex">\[
-\frac{U_1^n - U_0^n}{\Delta x} = 0, \qquad \frac{U_J^n - U_{J-1}^n}{\Delta x} = 0
-\]</div>
-<p>so <span class="arithmatex">\(U_0^n = U_1^n\)</span> and <span class="arithmatex">\(U_{J-1}^n = U_J^n\)</span>. In vector form <span class="arithmatex">\(\mathbf{U}^n = (U_0^n, \ldots, U_{J-1}^n)^T\)</span> the system is:</p>
-<div class="arithmatex">\[
-A \mathbf{U}^{n+1} = B \mathbf{U}^n + \mathbf{f}^n
-\]</div>
-<p>and</p>
-<div class="arithmatex">\[
-\mathbf{U}^{n+1} = A^{-1} \left( B \mathbf{U}^n + \mathbf{f}^n \right)
-\]</div>
-<p>Matrix <span class="arithmatex">\(A\)</span> is constant and can be factorised once; <span class="arithmatex">\(B \mathbf{U}^n + \mathbf{f}^n\)</span> is updated each time step.</p>
+<p>Properties:
+- Fully implicit
+- First order in time
+- Unconditionally stable for diffusion</p>
+<hr />
+<h2 id="derived-parameters">Derived Parameters<a class="headerlink" href="#derived-parameters" title="Permanent link">&para;</a></h2>
+<h3 id="r-dfracddelta-tdelta-x2"><span class="arithmatex">\( r = \dfrac{D\,\Delta t}{\Delta x^2} \)</span><a class="headerlink" href="#r-dfracddelta-tdelta-x2" title="Permanent link">&para;</a></h3>
+<p>Dimensionless diffusion number.</p>
+<p>Appears naturally in finite-difference discretisations of the Laplacian.</p>
+<hr />
+<h2 id="notes">Notes<a class="headerlink" href="#notes" title="Permanent link">&para;</a></h2>
+<ul>
+<li>Bold symbols typically represent vectors or matrices.</li>
+<li>Operators become matrices after spatial discretisation.</li>
+<li>In finite-element formulations, <span class="arithmatex">\( I \)</span> is replaced by a mass matrix.</li>
+</ul>
 
 
 

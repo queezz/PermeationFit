@@ -240,7 +240,7 @@
     
     
       <li class="md-tabs__item">
-        <a href="../theory/diffusion/" class="md-tabs__link">
+        <a href="../theory/backward-euler/" class="md-tabs__link">
           
   
   
@@ -401,6 +401,34 @@
   
   
     <li class="md-nav__item">
+      <a href="../theory/backward-euler/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Backward Euler
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../theory/diffusion/" class="md-nav__link">
         
   
@@ -429,7 +457,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../theory/finite_methods/" class="md-nav__link">
+      <a href="../theory/finite-methods/" class="md-nav__link">
         
   
   
@@ -522,6 +550,34 @@
     
   
     🕰️ History
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/notation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    🎶 Notation
   
 
     
@@ -723,7 +779,7 @@
 │   └── permeation/
 │       ├── __init__.py
 │       ├── diffusion.py
-│       ├── solvers.py
+│       ├── backward_euler.py
 │       ├── materials.py
 │       └── utils.py
 ├── summary.tex
@@ -732,8 +788,8 @@
 <h2 id="package-layout">Package layout<a class="headerlink" href="#package-layout" title="Permanent link">&para;</a></h2>
 <ul>
 <li><strong>src/permeation/</strong> — Single package, <code>src</code> layout (PEP 517/518 style). Name <code>permeation</code> matches the problem domain.</li>
-<li><strong>diffusion.py</strong> — Public API: <code>BE</code>, <code>parameters</code> (re-exported from materials/solvers).</li>
-<li><strong>solvers.py</strong> — Backward Euler implementation only. Logic taken from <code>oldcode/diffusion.py</code> (canonical version; <code>pdp_wavefit.py</code> had the same BE plus <code>tools</code> and wavefit).</li>
+<li><strong>diffusion.py</strong> — Public API: <code>BE</code>, <code>parameters</code> (re-exported from materials/backward_euler).</li>
+<li><strong>backward_euler.py</strong> — Backward Euler implementation only. Logic taken from <code>oldcode/diffusion.py</code> (canonical version; <code>pdp_wavefit.py</code> had the same BE plus <code>tools</code> and wavefit).</li>
 <li><strong>materials.py</strong> — Default <code>parameters()</code> dict (grid, physics constants, flags).</li>
 <li><strong>utils.py</strong> — <code>chi_square(exp, calc)</code> for fitting; no external <code>tools</code> dependency.</li>
 </ul>

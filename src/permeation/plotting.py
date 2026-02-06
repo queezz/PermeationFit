@@ -184,78 +184,67 @@ def plot_concentration_3d(
         ax.get_figure().savefig(savepath, bbox_inches="tight")
     return ax
 
-
 def plot_summary(
-    result: dict[str, Any],
-    profile_time_idx: int | None = None,
-    cmap: str = "inferno",
-    figsize: Sequence[float] = (14, 8),
-    savepath: str | None = None,
-) -> tuple[Any, Any, Any]:
-    """
-    Plot fluxes, a single (flat) concentration profile, and 3D surface in one figure.
-
-    Parameters
-    ----------
-    result : dict
-        Solver output from BE() with keys "x", "time", "c", "fluxes".
-    profile_time_idx : int or None, optional
-        Time index for the flat profile. None = last available time step.
-    cmap : str, optional
-        Colormap name for the 3D surface (default "inferno").
-    figsize : sequence of float, optional
-        (width, height) in inches for the combined figure.
-    savepath : str, optional
-        If set, save the figure to this path with bbox_inches="tight".
-
-    Returns
-    -------
-    tuple of matplotlib axes
-        (ax_fluxes, ax_profile, ax_3d)
-    """
+    result,
+    profile_time_idx=None,
+    cmap="inferno",
+    figsize=(15, 8),
+    savepath=None,
+):
     import matplotlib.pyplot as plt
     from matplotlib.gridspec import GridSpec
+    import numpy as np
 
     fig = plt.figure(figsize=figsize)
-    gs = GridSpec(2, 2, figure=fig, width_ratios=(1.0, 1.2))
-    ax_fluxes = fig.add_subplot(gs[0, 0])
-    ax_profile = fig.add_subplot(gs[1, 0])
-    ax_3d = fig.add_subplot(gs[:, 1], projection="3d")
 
-    plot_fluxes(result, ax=ax_fluxes)
+    gs = GridSpec(
+        nrows=2,
+        ncols=3,
+        figure=fig,
+        width_ratios=(1.0, 1.4, 0.06),   # left / 3D / colorbar
+        height_ratios=(1.0, 1.0),
+        wspace=0.25,
+        hspace=0.35,
+    )
 
-    x = np.asarray(result["x"])
+    ax_flux = fig.add_subplot(gs[0, 0])
+    ax_prof = fig.add_subplot(gs[1, 0])
+    ax_3d   = fig.add_subplot(gs[:, 1], projection="3d")
+    cax     = fig.add_subplot(gs[:, 2])
+
+    # --- Fluxes ---
+    plot_fluxes(result, ax=ax_flux)
+
+    # --- Profiles ---
+    plot_profiles(result, time_idx=profile_time_idx, ax=ax_prof)
+
+    x = np.asarray(result["x"]) / 1e-6
     t = np.asarray(result["time"])
     c = np.asarray(result["c"])
-    x_um = x / 1e-6
 
-    if c.size == 0 or c.ndim < 2:
-        ax_profile.text(
-            0.5,
-            0.5,
-            "no concentration data",
-            ha="center",
-            va="center",
-            transform=ax_profile.transAxes,
-        )
-    else:
-        n_times = c.shape[0]
-        idx = n_times - 1 if profile_time_idx is None else int(profile_time_idx)
-        if idx < 0:
-            idx = 0
-        if idx >= n_times:
-            idx = n_times - 1
-        ax_profile.plot(x_um, c[idx], color="C2")
-        if t.size:
-            ax_profile.set_title(f"profile at t = {t[idx]:g} s")
+    # --- 3D surface ---
+    X, Y = np.meshgrid(x, t)
+    cmax = float(np.max(c))
+    pwr = int(np.round(np.log10(cmax))) if cmax > 0 else 0
+    Z = c / (10**pwr)
 
-    ax_profile.set_xlabel("x (µm)")
-    ax_profile.set_ylabel("concentration (m⁻³)")
-    ax_profile.grid(True, alpha=0.3)
+    surf = ax_3d.plot_surface(
+        X, Y, Z,
+        cmap=cmap,
+        linewidth=0,
+        antialiased=False,
+    )
 
-    plot_concentration_3d(result, ax=ax_3d, cmap=cmap)
+    ax_3d.view_init(25, 40)
+    ax_3d.set_xlabel("d (µm)", labelpad=12)
+    ax_3d.set_ylabel("time (s)", labelpad=12)
+    ax_3d.set_zlabel(f"c × 10^{pwr} (H/m³)", labelpad=10)
 
-    fig.tight_layout()
+    # --- Colorbar (explicit axis!) ---
+    cb = fig.colorbar(surf, cax=cax)
+    cb.set_label("scaled concentration")
+
     if savepath:
         fig.savefig(savepath, bbox_inches="tight")
-    return ax_fluxes, ax_profile, ax_3d
+
+    return ax_flux, ax_prof, ax_3d

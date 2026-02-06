@@ -83,7 +83,7 @@ def plot_fluxes(
     savepath: str | None = None,
 ) -> Any:
     """
-    Plot inlet (reflected) and outlet (permeation) flux vs time.
+    Plot inlet (desorbed) and outlet (permeation) flux vs time.
 
     Parameters
     ----------
@@ -105,7 +105,7 @@ def plot_fluxes(
         _, ax = plt.subplots()
 
     t = fluxes["time"]
-    ax.plot(t, fluxes["rel"], label="inlet (reflected)", color="C0")
+    ax.plot(t, fluxes["rel"], label="inlet (desorbed)", color="C0")
     ax.plot(t, fluxes["perm"], label="outlet (permeation)", color="C1")
     ax.set_xlabel("time (s)")
     ax.set_ylabel("flux (m⁻² s⁻¹)")

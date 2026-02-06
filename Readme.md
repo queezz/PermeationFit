@@ -58,7 +58,7 @@ Notebooks in `notebooks/` (e.g. `RunDiffusion.ipynb`) use the same API after ins
 src/permeation/     # Python package
   __init__.py
   diffusion.py      # High-level API (BE, parameters)
-  solvers.py        # Backward Euler implementation
+  backward_euler.py # Backward Euler implementation
   materials.py      # Default parameters
   utils.py          # e.g. chi_square for fitting
 notebooks/          # Jupyter notebooks (exploration only)

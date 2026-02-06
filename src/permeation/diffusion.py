@@ -5,6 +5,6 @@ High-level diffusion API: Backward Euler permeation solver and default parameter
 from __future__ import annotations
 
 from permeation.materials import parameters
-from permeation.solvers import BE
+from permeation.backward_euler import BE
 
 __all__ = ["BE", "parameters"]

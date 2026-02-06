@@ -31,7 +31,7 @@ PermeationFit/
 │   └── permeation/
 │       ├── __init__.py
 │       ├── diffusion.py
-│       ├── solvers.py
+│       ├── backward_euler.py
 │       ├── materials.py
 │       └── utils.py
 ├── summary.tex
@@ -41,8 +41,8 @@ PermeationFit/
 ## Package layout
 
 - **src/permeation/** — Single package, `src` layout (PEP 517/518 style). Name `permeation` matches the problem domain.
-- **diffusion.py** — Public API: `BE`, `parameters` (re-exported from materials/solvers).
-- **solvers.py** — Backward Euler implementation only. Logic taken from `oldcode/diffusion.py` (canonical version; `pdp_wavefit.py` had the same BE plus `tools` and wavefit).
+- **diffusion.py** — Public API: `BE`, `parameters` (re-exported from materials/backward_euler).
+- **backward_euler.py** — Backward Euler implementation only. Logic taken from `oldcode/diffusion.py` (canonical version; `pdp_wavefit.py` had the same BE plus `tools` and wavefit).
 - **materials.py** — Default `parameters()` dict (grid, physics constants, flags).
 - **utils.py** — `chi_square(exp, calc)` for fitting; no external `tools` dependency.
 

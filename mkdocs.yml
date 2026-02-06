@@ -5,6 +5,8 @@ repo_url: ""
 
 theme:
   name: material
+  logo: assets/h2icon.svg
+  favicon: assets/h2icon.svg  
   icon:
     repo: fontawesome/brands/github
   features:

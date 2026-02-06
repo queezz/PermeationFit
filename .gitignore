@@ -1,7 +1,8 @@
+local/
+
 .DS_store
 *.code-workspace
 __latexindent_temp.tex
-notebooks/test.py
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

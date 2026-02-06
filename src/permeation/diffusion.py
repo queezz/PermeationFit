@@ -1,10 +1,10 @@
 """
-High-level diffusion API: Backward Euler permeation solver and default parameters.
+High-level diffusion API: Backward Euler permeation solver and Parameters.
 """
 
 from __future__ import annotations
 
-from permeation.materials import parameters
 from permeation.backward_euler import BE
+from permeation.materials import Parameters
 
-__all__ = ["BE", "parameters"]
+__all__ = ["BE", "Parameters"]

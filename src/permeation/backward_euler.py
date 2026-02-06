@@ -39,19 +39,22 @@ import pandas as pd
 from scipy.sparse import diags
 from scipy.sparse.linalg import spsolve
 
-from permeation.materials import parameters as default_parameters
+from permeation.materials import Parameters
 
 
-def BE(**kwargs: Any) -> dict[str, Any]:
+def BE(parameters: Parameters, **kwargs: Any) -> dict[str, Any]:
     """
     Backward Euler step for permeation: ∂u/∂t = D ∂²u/∂x² with flux/recombination BCs.
 
     Boundary conditions (upstream x=0, downstream x=L):
     Γ_in + D ∂u/∂x|_0 - k_u u(0)² = 0,  -D ∂u/∂x|_L - k_d u(L)² = 0.
 
-    Defaults come from permeation.materials.parameters(); pass any key to override
-    (e.g. Nx, Nt, T, D, L, ku, kd, ks, G, I, Uinit, ncorrection). Tend, saveU, PLOT
-    are accepted but not used by the solver.
+    Parameters
+    ----------
+    parameters : Parameters
+        Explicit parameter set (required). Use permeation.materials.Parameters.
+    **kwargs
+        Optional overrides for any parameter key (e.g. Nx, Nt, G).
 
     Returns
     -------
@@ -64,7 +67,7 @@ def BE(**kwargs: Any) -> dict[str, Any]:
         calctime : float, seconds
         pdp : (Nt+1,) outlet flux (alias for fluxes["perm"])
     """
-    params = default_parameters()
+    params = parameters.to_dict()
     params.update(kwargs)
     Nx = params["Nx"]
     Nt = params["Nt"]

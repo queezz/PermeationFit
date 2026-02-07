@@ -89,6 +89,40 @@ def multi_step_G(
     return gen
 
 
+def refine_steps(tstart, x):
+    """
+    Split each step into two equal sub-steps.
+
+    Parameters
+    ----------
+    tstart : array, shape (n,)
+        Fractional start times.
+    x : array, shape (n,)
+        Step values.
+
+    Returns
+    -------
+    tstart_new : array, shape (2n,)
+    x_new : array, shape (2n,)
+    """
+    tstart = np.asarray(tstart, float)
+    x = np.asarray(x, float)
+
+    n = len(tstart)
+    tstart_new = []
+    x_new = []
+
+    for i in range(n):
+        t0 = tstart[i]
+        t1 = tstart[i + 1] if i + 1 < n else 1.0
+        tm = 0.5 * (t0 + t1)
+
+        tstart_new.extend([t0, tm])
+        x_new.extend([x[i], x[i]])
+
+    return np.array(tstart_new), np.array(x_new)
+
+
 class Parameters:
     """
     Explicit parameters for the permeation solver.

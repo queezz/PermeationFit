@@ -18,10 +18,12 @@ from permeation.materials import multi_step_G, refine_steps, steps_from_starts
 
 
 def simulate_from_step_vals(
-    step_vals: np.ndarray | list[float],
-    tstart: np.ndarray | list[float],
-    base_params: Parameters,
-) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
+    step_vals,
+    tstart,
+    base_params,
+    *,
+    enforce_zero_after: float | None = None,
+):
     """
     Run a permeation simulation with G(t) given by step values at tstart.
 
@@ -46,6 +48,13 @@ def simulate_from_step_vals(
     base_kwargs = base_params.to_dict()
     base_kwargs.pop("G", None)
     base_kwargs.pop("G_generator", None)
+
+    step_vals = np.asarray(step_vals, float)
+    tstart = np.asarray(tstart, float)
+
+    if enforce_zero_after is not None:
+        tstart = np.append(tstart, enforce_zero_after)
+        step_vals = np.append(step_vals, 0.0)
 
     G_gen = multi_step_G(steps_from_starts(step_vals, tstart))
     params = Parameters(**base_kwargs, G_generator=G_gen)
@@ -75,55 +84,47 @@ def fit_G_steps(
     reg_l2: float = 0.0,
     reg_tv: float = 0.0,
     verbose: int = 2,
+    G_zero_after: float | None = None,
     **least_squares_kwargs: Any,
 ) -> dict[str, Any]:
     """
-    Fit step values of G(t) to measured downstream pressure by least squares.
+    Least-squares fit of a piecewise-constant incident flux G(t).
 
-    The unknown vector x is the step values; step times are fixed by tstart.
-    Optionally penalize L2 norm of x and/or total variation (smoothness) of x.
+    Fits step amplitudes x for fixed step start times tstart by matching
+    the downstream pressure pdp(t). Optional L2 and total-variation
+    regularization can be applied to the step values.
 
     Parameters
     ----------
     t_meas : array-like
-        Measurement time grid (fractional or absolute; must match model time axis).
+        Measurement time grid.
     pdp_meas : array-like
-        Measured downstream pressure at t_meas.
+        Measured downstream pressure.
     tstart : array-like
-        Fractional start times for each step (length = number of steps).
+        Step start times (fractional); defines the piecewise structure.
     base_params : Parameters
-        Base physical parameters; G is determined by the fit.
+        Physical parameters; G(t) is determined by the fit.
     x0 : array-like
-        Initial guess for step values (length = len(tstart)).
-    bounds : tuple of (lb, ub)
-        Lower and upper bounds for each step value. Default (0, inf).
+        Initial guess for step values.
+    bounds : (lb, ub)
+        Bounds for step values.
     weight : array-like, optional
-        Per-point weights; same shape as pdp_meas. Default unweighted.
-    reg_l2 : float
-        L2 regularization strength on x. Default 0.
-    reg_tv : float
-        Total-variation regularization strength on diff(x). Default 0.
-    verbose : int
-        Verbosity for scipy.optimize.least_squares (0, 1, 2).
+        Per-point weights for residuals.
+    reg_l2 : float, optional
+        L2 regularization strength on x.
+    reg_tv : float, optional
+        Total-variation regularization on diff(x).
+    verbose : int, optional
+        Verbosity level for least_squares.
     **least_squares_kwargs
-        Passed through to least_squares (e.g. ftol, xtol, max_nfev).
+        Passed to scipy.optimize.least_squares.
 
     Returns
     -------
-    dict with keys
-        x_hat : ndarray
-            Fitted step values.
-        result : scipy.optimize.OptimizeResult
-            Full least_squares result.
-        t_model : ndarray
-            Model time grid.
-        pdp_hat : ndarray
-            Fitted pdp on model grid.
-        G_hat : ndarray
-            Recovered G(t) on model grid.
-        tstart : ndarray
-            Step start times (copy of input).
+    dict
+        x_hat, result, t_model, pdp_hat, G_hat, tstart
     """
+
     t_meas = np.asarray(t_meas, float)
     pdp_meas = np.asarray(pdp_meas, float)
 
@@ -136,8 +137,13 @@ def fit_G_steps(
 
     tstart = np.asarray(tstart, float)
 
-    def residuals(x: np.ndarray) -> np.ndarray:
-        t_model, pdp_model, _ = simulate_from_step_vals(x, tstart, base_params)
+    def residuals(x):
+        t_model, pdp_model, _ = simulate_from_step_vals(
+            x,
+            tstart,
+            base_params,
+            enforce_zero_after=G_zero_after,
+        )
         pdp_model_i = interp_to_meas_grid(t_model, pdp_model, t_meas)
 
         r = (pdp_model_i - pdp_meas) * w
@@ -160,7 +166,9 @@ def fit_G_steps(
     )
 
     x_hat = res.x
-    t_model, pdp_hat, G_hat = simulate_from_step_vals(x_hat, tstart, base_params)
+    t_model, pdp_hat, G_hat = simulate_from_step_vals(
+        x_hat, tstart, base_params, enforce_zero_after=G_zero_after
+    )
 
     return {
         "x_hat": x_hat,

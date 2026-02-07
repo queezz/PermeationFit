@@ -137,8 +137,8 @@ def fit_G_steps(
     tstart = np.asarray(tstart, float)
 
     def residuals(x: np.ndarray) -> np.ndarray:
-        _, pdp_model, _ = simulate_from_step_vals(x, tstart, base_params)
-        pdp_model_i = interp_to_meas_grid(_, pdp_model, t_meas)
+        t_model, pdp_model, _ = simulate_from_step_vals(x, tstart, base_params)
+        pdp_model_i = interp_to_meas_grid(t_model, pdp_model, t_meas)
 
         r = (pdp_model_i - pdp_meas) * w
 

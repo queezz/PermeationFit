@@ -14,7 +14,7 @@ import numpy as np
 from scipy.optimize import least_squares
 
 from permeation.diffusion import BE, Parameters
-from permeation.materials import multi_step_G, steps_from_starts
+from permeation.materials import multi_step_G, refine_steps, steps_from_starts
 
 
 def simulate_from_step_vals(
@@ -169,4 +169,93 @@ def fit_G_steps(
         "pdp_hat": pdp_hat,
         "G_hat": G_hat,
         "tstart": tstart,
+    }
+
+
+def fit_G_steps_zoom(
+    t_meas: np.ndarray | list[float],
+    pdp_meas: np.ndarray | list[float],
+    base_params: Parameters,
+    initial_guess: float,
+    n_levels: int,
+    *,
+    bounds: tuple[float, float] = (0.0, np.inf),
+    weight: np.ndarray | None = None,
+    reg_l2: float = 1e-6,
+    reg_tv: float = 1e-3,
+    max_nfev: int = 200,
+    verbose: int = 1,
+    **fit_G_steps_kwargs: Any,
+) -> dict[str, Any]:
+    """
+    Multi-level "zoom" fit: start with one step, refine by splitting steps each level.
+
+    Level 0: one step over [0, 1]. Each level doubles the number of steps via
+    refine_steps (split each step into two). Fitted values from the previous
+    level are used as initial guess for the next.
+
+    Parameters
+    ----------
+    t_meas : array-like
+        Measurement time grid.
+    pdp_meas : array-like
+        Measured downstream pressure at t_meas.
+    base_params : Parameters
+        Base physical parameters.
+    initial_guess : float
+        Initial step value for the single step at level 0.
+    n_levels : int
+        Number of refinement levels (0 = one step only).
+    bounds : tuple of (lb, ub)
+        Bounds for each step value.
+    weight : array-like, optional
+        Per-point weights; same shape as pdp_meas.
+    reg_l2, reg_tv : float
+        L2 and total-variation regularization (used at every level).
+    max_nfev : int
+        Max function evaluations per level (passed to least_squares).
+    verbose : int
+        Verbosity for least_squares (0, 1, 2).
+    **fit_G_steps_kwargs
+        Passed through to fit_G_steps each level (e.g. ftol, xtol).
+
+    Returns
+    -------
+    dict with keys
+        history : list of dict
+            One fit result dict per level (same structure as fit_G_steps return).
+        tstart : ndarray
+            Step start times from the last level.
+        x_hat : ndarray
+            Fitted step values from the last level.
+    """
+    tstart = np.array([0.0], dtype=float)
+    x0 = np.array([float(initial_guess)])
+
+    history: list[dict[str, Any]] = []
+
+    for level in range(n_levels):
+        out = fit_G_steps(
+            t_meas,
+            pdp_meas,
+            tstart,
+            base_params,
+            x0,
+            bounds=bounds,
+            weight=weight,
+            reg_l2=reg_l2,
+            reg_tv=reg_tv,
+            verbose=verbose,
+            max_nfev=max_nfev,
+            **fit_G_steps_kwargs,
+        )
+        history.append(out)
+
+        # prepare next level: double steps via refine_steps
+        tstart, x0 = refine_steps(tstart, out["x_hat"])
+
+    return {
+        "history": history,
+        "tstart": history[-1]["tstart"],
+        "x_hat": history[-1]["x_hat"],
     }

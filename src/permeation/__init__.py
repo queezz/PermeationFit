@@ -11,6 +11,7 @@ from permeation.materials import (
     zeros_G,
     step_G,
     multi_step_G,
+    refine_steps,
     steps_from_starts,
 )
 from permeation.plotting import (
@@ -24,6 +25,7 @@ from permeation.inverse_fit import (
     simulate_from_step_vals,
     interp_to_meas_grid,
     fit_G_steps,
+    fit_G_steps_zoom,
 )
 
 __all__ = [
@@ -33,6 +35,7 @@ __all__ = [
     "zeros_G",
     "step_G",
     "multi_step_G",
+    "refine_steps",
     "steps_from_starts",
     "chi_square",
     "plot_summary",
@@ -42,4 +45,5 @@ __all__ = [
     "simulate_from_step_vals",
     "interp_to_meas_grid",
     "fit_G_steps",
+    "fit_G_steps_zoom",
 ]

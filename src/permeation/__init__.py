@@ -2,6 +2,7 @@
 Permeation: 1D hydrogen diffusion through a membrane with recombination boundary conditions.
 
 Solver: Backward Euler (implicit) with nonlinear BCs handled by iterative correction.
+Inverse fit: recover G(t) step values from measured downstream pressure (see inverse_fit).
 """
 
 from permeation.diffusion import BE, Parameters
@@ -19,6 +20,11 @@ from permeation.plotting import (
     plot_summary,
 )
 from permeation.utils import chi_square
+from permeation.inverse_fit import (
+    simulate_from_step_vals,
+    interp_to_meas_grid,
+    fit_G_steps,
+)
 
 __all__ = [
     "BE",
@@ -33,4 +39,7 @@ __all__ = [
     "plot_profiles",
     "plot_fluxes",
     "plot_concentration_3d",
+    "simulate_from_step_vals",
+    "interp_to_meas_grid",
+    "fit_G_steps",
 ]

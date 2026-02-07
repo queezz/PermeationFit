@@ -26,6 +26,7 @@ from permeation.inverse_fit import (
     interp_to_meas_grid,
     fit_G_steps,
     fit_G_steps_zoom,
+    fit_with_adaptive_bins,
 )
 
 __all__ = [
@@ -46,4 +47,5 @@ __all__ = [
     "interp_to_meas_grid",
     "fit_G_steps",
     "fit_G_steps_zoom",
+    "fit_with_adaptive_bins",
 ]

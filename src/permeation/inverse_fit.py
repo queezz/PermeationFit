@@ -17,6 +17,80 @@ from permeation.diffusion import BE, Parameters
 from permeation.materials import multi_step_G, refine_steps, steps_from_starts
 
 
+def _bin_scores_from_residual(t_meas, r, edges_frac, T=None, weight=None):
+    if T is None:
+        t = np.asarray(t_meas)
+        edges = np.asarray(edges_frac)
+    else:
+        t = np.asarray(t_meas)
+        edges = np.asarray(edges_frac) * float(T)
+
+    r = np.asarray(r, float)
+    if weight is None:
+        w = np.ones_like(r)
+    else:
+        w = np.asarray(weight, float)
+
+    K = len(edges) - 1
+    scores = np.zeros(K, float)
+    idx = np.searchsorted(edges, t, side="right") - 1
+    valid = (idx >= 0) & (idx < K)
+    idx = idx[valid]
+    rv = r[valid]
+    wv = w[valid]
+    np.add.at(scores, idx, (rv * rv) * wv)
+    return scores
+
+
+def refine_bins_adaptive(
+    edges_frac,
+    x_hat,
+    t_meas,
+    pdp_meas,
+    pdp_hat_meas,
+    *,
+    T=None,
+    weight=None,
+    max_splits=2,
+    min_width_frac=0.02,
+    split_strategy="mid",
+):
+    edges_frac = np.asarray(edges_frac, float)
+    x_hat = np.asarray(x_hat, float)
+    r = np.asarray(pdp_meas, float) - np.asarray(pdp_hat_meas, float)
+    scores = _bin_scores_from_residual(t_meas, r, edges_frac, T=T, weight=weight)
+    widths = np.diff(edges_frac)
+    eligible = widths >= (2 * min_width_frac)
+    cand = np.where(eligible)[0]
+    if cand.size == 0:
+        return edges_frac, x_hat, scores
+
+    worst = cand[np.argsort(scores[cand])[::-1]]
+    worst = worst[:max_splits]
+    new_edges = [edges_frac[0]]
+    new_x = []
+
+    for k in range(len(x_hat)):
+        a = edges_frac[k]
+        b = edges_frac[k + 1]
+        val = x_hat[k]
+        if k in set(worst):
+            m = 0.5 * (a + b)
+            new_edges.append(m)
+            new_edges.append(b)
+            new_x.append(val)
+            new_x.append(val)
+        else:
+            new_edges.append(b)
+            new_x.append(val)
+
+    new_edges = np.asarray(new_edges, float)
+    keep = np.hstack(([True], np.diff(new_edges) > 0))
+    new_edges = new_edges[keep]
+    new_x = np.asarray(new_x, float)
+    return new_edges, new_x, scores
+
+
 def simulate_from_step_vals(
     step_vals,
     tstart,
@@ -266,4 +340,79 @@ def fit_G_steps_zoom(
         "history": history,
         "tstart": history[-1]["tstart"],
         "x_hat": history[-1]["x_hat"],
+    }
+
+
+def fit_with_adaptive_bins(
+    t_meas: np.ndarray | list[float],
+    pdp_meas: np.ndarray | list[float],
+    edges_frac: np.ndarray | list[float],
+    x0: np.ndarray | list[float],
+    base_params: Parameters,
+    *,
+    T: float | None = None,
+    weight: np.ndarray | None = None,
+    max_bins: int = 64,
+    max_refinement_depth: int = 20,
+    max_splits: int = 2,
+    min_width_frac: float = 0.02,
+    split_strategy: str = "mid",
+    bounds: tuple[float, float] = (0.0, np.inf),
+    reg_l2: float = 0.0,
+    reg_tv: float = 0.0,
+    G_zero_after: float | None = None,
+    verbose: int = 2,
+    **fit_kwargs: Any,
+) -> dict[str, Any]:
+    edges_frac = np.asarray(edges_frac, float)
+    x0 = np.asarray(x0, float)
+    history: list[tuple[np.ndarray, np.ndarray, np.ndarray]] = []
+    out = None
+    x_hat = x0
+
+    for _ in range(max(1, max_refinement_depth)):
+        tstart = edges_frac[:-1].copy()
+        out = fit_G_steps(
+            t_meas,
+            pdp_meas,
+            tstart,
+            base_params,
+            x0,
+            bounds=bounds,
+            weight=weight,
+            reg_l2=reg_l2,
+            reg_tv=reg_tv,
+            verbose=verbose,
+            G_zero_after=G_zero_after,
+            **fit_kwargs,
+        )
+        x_hat = out["x_hat"]
+        pdp_hat_meas = interp_to_meas_grid(out["t_model"], out["pdp_hat"], t_meas)
+        new_edges, new_x, scores = refine_bins_adaptive(
+            edges_frac,
+            x_hat,
+            t_meas,
+            pdp_meas,
+            pdp_hat_meas,
+            T=T,
+            weight=weight,
+            max_splits=max_splits,
+            min_width_frac=min_width_frac,
+            split_strategy=split_strategy,
+        )
+        history.append((edges_frac.copy(), x_hat.copy(), scores))
+
+        no_split = len(new_x) == len(x_hat)
+        at_max_bins = len(new_x) >= max_bins
+        if no_split or at_max_bins:
+            break
+        edges_frac = new_edges
+        x0 = new_x
+
+    return {
+        "edges_frac": edges_frac,
+        "x_hat": x_hat,
+        "history": history,
+        "result": out,
+        "tstart": out["tstart"],
     }

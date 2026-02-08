@@ -62,6 +62,7 @@ repo_name: queezz/PermeationFit
 # MARK: nav
 nav:
   - 🏠 Home: index.md
+  - 🗺️ Package map: package-map.md
   - 🧠 Theory:
       - Backward Euler: theory/backward-euler.md
       - 🌊 Diffusion equation: theory/diffusion.md

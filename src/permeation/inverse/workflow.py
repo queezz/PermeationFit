@@ -38,6 +38,7 @@ class InverseFitWorkflow:
         self.t_true = np.asarray(t_true, float) if t_true is not None else None
         self.pdp_true = np.asarray(pdp_true, float) if pdp_true is not None else None
         self.G_true = np.asarray(G_true, float) if G_true is not None else None
+        self._enforce_zero_after: float | None = None
         self._result: dict[str, Any] | None = None
 
     @classmethod
@@ -69,7 +70,7 @@ class InverseFitWorkflow:
         )
         noise = noise_rel * np.max(pdp_true) * rng.normal(size=pdp_true.shape)
         pdp_meas = pdp_true + noise
-        return cls(
+        wf = cls(
             t_meas=t_true.copy(),
             pdp_meas=pdp_meas,
             base_params=base_params,
@@ -77,6 +78,8 @@ class InverseFitWorkflow:
             pdp_true=pdp_true,
             G_true=G_true,
         )
+        wf._enforce_zero_after = enforce_zero_after
+        return wf
 
     def fit(
         self,
@@ -95,6 +98,9 @@ class InverseFitWorkflow:
         Run fit_G_steps_zoom and store result. Passes kwargs to permeation.
         Returns the zoom result dict.
         """
+        kw = dict(kwargs)
+        if "G_zero_after" not in kw and self._enforce_zero_after is not None:
+            kw["G_zero_after"] = self._enforce_zero_after
         self._result = fit_G_steps_zoom(
             t_meas=self.t_meas,
             pdp_meas=self.pdp_meas,
@@ -107,7 +113,7 @@ class InverseFitWorkflow:
             max_nfev=max_nfev,
             verbose=verbose,
             save_states=save_states,
-            **kwargs,
+            **kw,
         )
         return self._result
 
@@ -174,3 +180,23 @@ class InverseFitWorkflow:
         if kind == "convergence":
             return plot_convergence_history(zoom, **kwargs)
         raise ValueError(f"Unknown plot kind: {kind}")
+
+    def export_frames(self, **kwargs: Any) -> list[str]:
+        """
+        Export zoom-state frames via export_zoom_states_frames. Passes
+        enforce_zero_after from workflow when set. Requires save_states=True.
+        """
+        from permeation.viz.plotting import export_zoom_states_frames
+
+        if self._result is None:
+            raise RuntimeError("Run fit() with save_states=True before export_frames")
+        kw = dict(kwargs)
+        if "enforce_zero_after" not in kw and self._enforce_zero_after is not None:
+            kw["enforce_zero_after"] = self._enforce_zero_after
+        return export_zoom_states_frames(
+            self._result,
+            self.t_meas,
+            self.pdp_meas,
+            self.base_params,
+            **kw,
+        )

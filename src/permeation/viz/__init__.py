@@ -9,6 +9,7 @@ from permeation.viz.plotting import (
     plot_profiles,
     plot_summary,
     plot_zoom_frame,
+    export_zoom_states_frames,
 )
 
 __all__ = [
@@ -20,4 +21,5 @@ __all__ = [
     "plot_inverse_summary",
     "plot_zoom_frame",
     "plot_convergence_history",
+    "export_zoom_states_frames",
 ]

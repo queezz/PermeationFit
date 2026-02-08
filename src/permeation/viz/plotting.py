@@ -7,6 +7,7 @@ Requires matplotlib.
 
 from __future__ import annotations
 
+from pathlib import Path
 from typing import Any, Sequence
 
 import matplotlib.pyplot as plt
@@ -495,3 +496,96 @@ def plot_convergence_history(
     ax.set_title("Convergence")
     plt.tight_layout()
     return fig
+
+
+def export_zoom_states_frames(
+    zoom: dict[str, Any],
+    t_meas: np.ndarray,
+    pdp_meas: np.ndarray,
+    base_params: Any,
+    *,
+    outdir: str = "frames",
+    fade: float = 0.7,
+    active_color: str = "#b24a3a",
+    history_color: str = "0.7",
+    dpi: int = 150,
+    figsize: Sequence[float] = (6, 4),
+    show_title: bool = True,
+    enforce_zero_after: float | None = None,
+) -> list[str]:
+    """
+    Save one PNG frame per optimizer state. Groups by zoom level.
+    Requires zoom["states"] (run fit with save_states=True).
+    Returns list of saved file paths. Deterministic, batch-safe.
+    """
+    from permeation.inverse.inverse_fit import simulate_from_step_vals
+
+    states = zoom.get("states")
+    if states is None:
+        raise ValueError("zoom['states'] is None; run fit with save_states=True")
+
+    t_meas = np.asarray(t_meas, float)
+    pdp_meas = np.asarray(pdp_meas, float)
+    saved: list[str] = []
+
+    # Group states by level (states are sequential: level 0, then 1, ...)
+    by_level: dict[int, list[dict]] = {}
+    for s in states:
+        lev = int(s["level"])
+        by_level.setdefault(lev, []).append(s)
+
+    for level, lev_states in sorted(by_level.items()):
+        level_dir = Path(outdir) / f"level_{level}"
+        level_dir.mkdir(parents=True, exist_ok=True)
+
+        # Precompute model curves for all states at this level
+        curves: list[tuple[np.ndarray, np.ndarray, np.ndarray]] = []
+        for s in lev_states:
+            t_model, pdp_hat, G_hat = simulate_from_step_vals(
+                s["x"],
+                s["tstart"],
+                base_params,
+                enforce_zero_after=enforce_zero_after,
+            )
+            curves.append((t_model, pdp_hat, G_hat))
+
+        t_all = np.concatenate([c[0] for c in curves] + [t_meas])
+        pdp_all = np.concatenate([c[1] for c in curves] + [pdp_meas])
+        G_all = np.concatenate([c[2] for c in curves])
+        tlim = (t_all.min(), t_all.max())
+        pdp_pad = 0.05 * (pdp_all.max() - pdp_all.min()) if pdp_all.size else 0
+        G_pad = 0.05 * (G_all.max() - G_all.min()) if G_all.size else 0
+
+        for k in range(len(lev_states)):
+            fig, (ax1, ax2) = plt.subplots(2, 1, sharex=True, figsize=figsize)
+
+            ax1.plot(t_meas, pdp_meas, "o", color="black", ms=2)
+
+            for j in range(k):
+                alpha = float(fade ** (k - j))
+                t_m, p_m, g_m = curves[j]
+                ax1.plot(t_m, p_m, "-", lw=0.8, color=history_color, alpha=alpha)
+                ax2.step(t_m, g_m, where="post", lw=0.8, color=history_color, alpha=alpha)
+
+            t_m, p_m, g_m = curves[k]
+            ax1.plot(t_m, p_m, "-", lw=2.0, color=active_color)
+            ax2.step(t_m, g_m, where="post", lw=2.0, color=active_color)
+
+            ax1.set_xlim(tlim)
+            ax1.set_ylim(pdp_all.min() - pdp_pad, pdp_all.max() + pdp_pad)
+            ax2.set_ylim(G_all.min() - G_pad, G_all.max() + G_pad)
+            ax1.set_ylabel("pdp")
+            ax2.set_ylabel("G")
+            ax2.set_xlabel("time")
+
+            if show_title:
+                cost = lev_states[k].get("cost", float("nan"))
+                fig.suptitle(f"Level {level}, iter {k}, cost={cost:.3e}")
+
+            plt.tight_layout()
+            path = level_dir / f"frame_{k:03d}.png"
+            fig.savefig(path, dpi=dpi, bbox_inches="tight")
+            plt.close(fig)
+            saved.append(str(path))
+
+    return saved

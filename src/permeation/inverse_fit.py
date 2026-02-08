@@ -8,7 +8,7 @@ regularization.
 
 from __future__ import annotations
 
-from typing import Any
+from typing import Any, Callable
 
 import numpy as np
 from scipy.optimize import least_squares
@@ -159,6 +159,7 @@ def fit_G_steps(
     reg_tv: float = 0.0,
     verbose: int = 2,
     G_zero_after: float | None = None,
+    state_callback: Callable[[np.ndarray, np.ndarray], None] | None = None,
     **least_squares_kwargs: Any,
 ) -> dict[str, Any]:
     """
@@ -229,6 +230,9 @@ def fit_G_steps(
             dx = np.diff(x)
             r = np.concatenate([r, np.sqrt(reg_tv) * dx])
 
+        if state_callback is not None:
+            state_callback(x, r)
+
         return r
 
     res = least_squares(
@@ -267,6 +271,7 @@ def fit_G_steps_zoom(
     reg_tv: float = 1e-3,
     max_nfev: int = 200,
     verbose: int = 1,
+    save_states: bool = False,
     **fit_G_steps_kwargs: Any,
 ) -> dict[str, Any]:
     """
@@ -306,6 +311,8 @@ def fit_G_steps_zoom(
     dict with keys
         history : list of dict
             One fit result dict per level (same structure as fit_G_steps return).
+        states : list of dict or None
+            All solver iterations (level, iter, tstart, x, cost) when save_states=True.
         tstart : ndarray
             Step start times from the last level.
         x_hat : ndarray
@@ -313,10 +320,32 @@ def fit_G_steps_zoom(
     """
     tstart = np.array([0.0], dtype=float)
     x0 = np.array([float(initial_guess)])
-
     history: list[dict[str, Any]] = []
+    states: list[dict[str, Any]] | None = [] if save_states else None
 
     for level in range(n_levels):
+        if save_states and states is not None:
+            iter_counter = [0]
+
+            def make_callback(lev: int, ts: np.ndarray, st: list):
+                def cb(x: np.ndarray, r: np.ndarray):
+                    st.append(
+                        {
+                            "level": lev,
+                            "iter": iter_counter[0],
+                            "tstart": np.asarray(ts, float).copy(),
+                            "x": np.asarray(x, float).copy(),
+                            "cost": float(0.5 * np.sum(r * r)),
+                        }
+                    )
+                    iter_counter[0] += 1
+
+                return cb
+
+            state_cb = make_callback(level, tstart, states)
+        else:
+            state_cb = None
+
         out = fit_G_steps(
             t_meas,
             pdp_meas,
@@ -327,6 +356,7 @@ def fit_G_steps_zoom(
             weight=weight,
             reg_l2=reg_l2,
             reg_tv=reg_tv,
+            state_callback=state_cb,
             verbose=verbose,
             max_nfev=max_nfev,
             **fit_G_steps_kwargs,
@@ -338,6 +368,7 @@ def fit_G_steps_zoom(
 
     return {
         "history": history,
+        "states": states,
         "tstart": history[-1]["tstart"],
         "x_hat": history[-1]["x_hat"],
     }

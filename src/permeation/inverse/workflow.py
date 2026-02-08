@@ -123,14 +123,26 @@ class InverseFitWorkflow:
         **kwargs: Any,
     ) -> Any:
         """
-        Delegate to permeation.viz.plotting. kind: 'summary' | 'zoom_frame' | 'convergence'.
-        For 'zoom_frame', pass level (int). Returns matplotlib figure/axes per viz.
+        Delegate to permeation.viz.plotting. kind: 'G' | 'summary' | 'zoom_frame' | 'convergence'.
+        'G' runs before fitting; others require fit() first. For 'zoom_frame', pass level (int).
+        Returns matplotlib figure/axes per viz.
         """
         from permeation.viz.plotting import (
+            plot_G,
             plot_convergence_history,
             plot_inverse_summary,
             plot_zoom_frame,
         )
+
+        if kind == "G":
+            return plot_G(
+                self.t_meas,
+                self.pdp_meas,
+                t_true=self.t_true,
+                pdp_true=self.pdp_true,
+                G_true=self.G_true,
+                **kwargs,
+            )
 
         if self._result is None:
             raise RuntimeError("Run fit() before plotting")

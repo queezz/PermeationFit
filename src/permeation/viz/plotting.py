@@ -337,6 +337,46 @@ def plot_summary(
 
 
 # MARK: inverse-fit plotting
+def plot_G(
+    t_meas: np.ndarray,
+    pdp_meas: np.ndarray,
+    *,
+    t_true: np.ndarray | None = None,
+    pdp_true: np.ndarray | None = None,
+    G_true: np.ndarray | None = None,
+    **kwargs: Any,
+) -> plt.Figure:
+    """
+    Two-panel: pdp and G (true/input). Use before fitting to inspect synthetic data.
+    For real data, only pdp_meas is shown.
+    """
+    has_true = t_true is not None and pdp_true is not None
+    has_G = t_true is not None and G_true is not None
+
+    if has_G:
+        fig, (ax1, ax2) = plt.subplots(2, 1, sharex=True)
+    else:
+        fig, ax1 = plt.subplots()
+        ax2 = None
+
+    ax1.plot(t_meas, pdp_meas, "o", color="#8f6ed4", ms=2, label="meas")
+    if has_true:
+        ax1.plot(t_true, pdp_true, "-", color="#8f6ed4", label="true")
+    ax1.set_ylabel("pdp")
+    ax1.legend(frameon=False)
+
+    if has_G and ax2 is not None:
+        ax2.step(t_true, G_true, where="post", lw=2, color="#8f6ed4", label="true G")
+        ax2.set_ylabel("G")
+        ax2.set_xlabel("time")
+        ax2.legend(frameon=False)
+    else:
+        ax1.set_xlabel("time")
+
+    plt.tight_layout()
+    return fig
+
+
 def plot_inverse_summary(
     zoom: dict[str, Any],
     t_meas: np.ndarray,

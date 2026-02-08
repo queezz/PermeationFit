@@ -1,5 +1,5 @@
 """
-Inverse fit: recover step values of G(t) from measured downstream pressure (pdp).
+Inverse fit: recover step values of G(t) from measured downstream flux (pdp).
 
 Given measurement times, measured pdp, step start times, and base Parameters,
 fits the step values by least-squares with optional L2 and total-variation
@@ -17,6 +17,7 @@ from permeation.physics.diffusion import BE, Parameters
 from permeation.physics.materials import multi_step_G, refine_steps, steps_from_starts
 
 
+# MARK: Utility
 def _bin_scores_from_residual(t_meas, r, edges_frac, T=None, weight=None):
     if T is None:
         t = np.asarray(t_meas)
@@ -42,6 +43,7 @@ def _bin_scores_from_residual(t_meas, r, edges_frac, T=None, weight=None):
     return scores
 
 
+# MARK: Adaptive Refinement
 def refine_bins_adaptive(
     edges_frac,
     x_hat,
@@ -91,6 +93,7 @@ def refine_bins_adaptive(
     return new_edges, new_x, scores
 
 
+# MARK: Simulation
 def simulate_from_step_vals(
     step_vals,
     tstart,
@@ -146,6 +149,7 @@ def interp_to_meas_grid(
     return np.interp(t_meas, t_model, y_model)
 
 
+# MARK: Single-Level Fit
 def fit_G_steps(
     t_meas: np.ndarray | list[float],
     pdp_meas: np.ndarray | list[float],
@@ -166,7 +170,7 @@ def fit_G_steps(
     Least-squares fit of a piecewise-constant incident flux G(t).
 
     Fits step amplitudes x for fixed step start times tstart by matching
-    the downstream pressure pdp(t). Optional L2 and total-variation
+    the downstream flux pdp(t). Optional L2 and total-variation
     regularization can be applied to the step values.
 
     Parameters
@@ -174,7 +178,7 @@ def fit_G_steps(
     t_meas : array-like
         Measurement time grid.
     pdp_meas : array-like
-        Measured downstream pressure.
+        Measured downstream flux.
     tstart : array-like
         Step start times (fractional); defines the piecewise structure.
     base_params : Parameters
@@ -258,6 +262,7 @@ def fit_G_steps(
     }
 
 
+# MARK: Zoom Fit
 def fit_G_steps_zoom(
     t_meas: np.ndarray | list[float],
     pdp_meas: np.ndarray | list[float],
@@ -374,6 +379,7 @@ def fit_G_steps_zoom(
     }
 
 
+# MARK: Adaptive Fit
 def fit_with_adaptive_bins(
     t_meas: np.ndarray | list[float],
     pdp_meas: np.ndarray | list[float],

@@ -1,4 +1,6 @@
 local/
+examples/frames/
+examples/exploring/frames/
 
 .DS_store
 *.code-workspace

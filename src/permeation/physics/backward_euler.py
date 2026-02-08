@@ -39,7 +39,7 @@ import pandas as pd
 from scipy.sparse import diags
 from scipy.sparse.linalg import spsolve
 
-from permeation.materials import Parameters
+from permeation.physics.materials import Parameters
 
 
 def BE(parameters: Parameters, **kwargs: Any) -> dict[str, Any]:

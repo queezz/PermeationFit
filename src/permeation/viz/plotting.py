@@ -1,14 +1,16 @@
 """
-Plotting helpers for permeation solver output.
+Plotting helpers for permeation solver output and inverse-fit workflow.
 
-Operate only on the result dictionary returned by BE(). No solver internals
-or global state. Requires matplotlib.
+Operate only on result dictionaries. No solver internals or global state.
+Requires matplotlib.
 """
 
 from __future__ import annotations
 
 from typing import Any, Sequence
 
+import matplotlib.pyplot as plt
+import matplotlib.colors as mcolors
 import numpy as np
 
 
@@ -43,7 +45,6 @@ def plot_profiles(
     -------
     matplotlib axes
     """
-    import matplotlib.pyplot as plt
     from matplotlib import cm
     from matplotlib.colors import Normalize
 
@@ -107,8 +108,6 @@ def plot_fluxes(
     -------
     matplotlib axes
     """
-    import matplotlib.pyplot as plt
-
     fluxes = result["fluxes"]
     if ax is None:
         _, ax = plt.subplots()
@@ -157,7 +156,6 @@ def plot_concentration_3d(
     -------
     matplotlib 3D axes
     """
-    import matplotlib.pyplot as plt
     from matplotlib import cm as mpl_cm
 
     x = np.asarray(result["x"])
@@ -197,7 +195,7 @@ def plot_concentration_3d(
     return ax
 
 
-# MARK: summary
+# MARK: solver summary
 def plot_summary(
     result,
     profile_time_idx=None,
@@ -205,9 +203,11 @@ def plot_summary(
     figsize=(15, 8),
     savepath=None,
 ):
-    import matplotlib.pyplot as plt
-    from matplotlib.gridspec import GridSpec, GridSpecFromSubplotSpec
-    import numpy as np
+    """
+    Multi-panel summary: fluxes, spatial profiles, 3D concentration surface.
+    For BE() solver result.
+    """
+    from matplotlib.gridspec import GridSpec
 
     fig = plt.figure(figsize=figsize)
 
@@ -224,7 +224,7 @@ def plot_summary(
     ax_flux = fig.add_subplot(gs[0, 0])
     ax_prof = fig.add_subplot(gs[1, 0])
 
-    # 👇 span both rows
+    # span both rows
     ax_3d = fig.add_subplot(gs[:, 1], projection="3d")
 
     # --- Fluxes ---
@@ -328,18 +328,130 @@ def plot_summary(
         va="top",
         fontweight="bold",
     )
-    ax_prof.text(
-        -0.1,
-        1.1,
-        "b.",
-        transform=ax_prof.transAxes,
-        ha="left",
-        va="top",
-        fontweight="bold",
-    )
 
     if savepath:
         fig.savefig(savepath, bbox_inches="tight")
 
     fig.subplots_adjust(top=0.92)
     return ax_flux, ax_3d, ax_prof
+
+
+# MARK: inverse-fit plotting
+def plot_inverse_summary(
+    zoom: dict[str, Any],
+    t_meas: np.ndarray,
+    pdp_meas: np.ndarray,
+    *,
+    t_true: np.ndarray | None = None,
+    pdp_true: np.ndarray | None = None,
+    G_true: np.ndarray | None = None,
+    **kwargs: Any,
+) -> tuple[plt.Figure, tuple[plt.Axes, plt.Axes]]:
+    """
+    Two-panel: measured vs fitted pdp and recovered G across zoom levels.
+    Optional t_true, pdp_true, G_true for synthetic-data comparison.
+    """
+    hist = zoom["history"]
+    fit = hist[-1]
+    fig, (ax1, ax2) = plt.subplots(2, 1, sharex=True)
+
+    if t_true is not None and pdp_true is not None:
+        ax1.plot(t_true, pdp_true, "-", color="#8f6ed4", label="true")
+    ax1.plot(t_meas, pdp_meas, "o", color="#8f6ed4", ms=2, label="meas")
+
+    n_hist = len(hist)
+    cmap = plt.get_cmap("autumn")
+    norm = mcolors.Normalize(vmin=0, vmax=max(1, n_hist - 1))
+
+    for k, h in enumerate(hist):
+        color = cmap(norm(k))
+        ax1.plot(h["t_model"], h["pdp_hat"], "-", lw=1.2, color=color)
+        ax2.step(h["t_model"], h["G_hat"], where="post", lw=1.2, color=color)
+
+    ax1.plot(fit["t_model"], fit["pdp_hat"], "-", lw=2.5, color="#454231", label="fit (final)")
+    ax2.step(fit["t_model"], fit["G_hat"], where="post", lw=2.5, color="#454231", label="G (final)")
+    if t_true is not None and G_true is not None:
+        ax2.step(t_true, G_true, where="post", lw=2, color="#8f6ed4", label="true G")
+
+    ax1.set_ylabel("pdp")
+    ax1.legend(frameon=False)
+    ax2.set_ylabel("G")
+    ax2.set_xlabel("time")
+    ax2.legend(frameon=False)
+    plt.tight_layout()
+    return fig, (ax1, ax2)
+
+
+def plot_zoom_frame(
+    zoom: dict[str, Any],
+    t_meas: np.ndarray,
+    pdp_meas: np.ndarray,
+    level: int,
+    *,
+    t_true: np.ndarray | None = None,
+    pdp_true: np.ndarray | None = None,
+    G_true: np.ndarray | None = None,
+    active_color: str = "#b24a3a",
+    history_color: str = "0.7",
+    **kwargs: Any,
+) -> plt.Figure:
+    """
+    Single-level frame: previous levels in gray, active level highlighted.
+    For animation/sequence visualization.
+    """
+    hist = zoom["history"]
+    if level < 0 or level >= len(hist):
+        raise ValueError(f"level must be in [0, {len(hist)-1}]")
+    h = hist[level]
+
+    fig, (ax1, ax2) = plt.subplots(2, 1, sharex=True)
+
+    ax1.plot(t_meas, pdp_meas, "o", ms=2, color="#8f6ed4")
+    if t_true is not None and pdp_true is not None:
+        ax1.plot(t_true, pdp_true, "-", color="#8f6ed4")
+    if t_true is not None and G_true is not None:
+        ax2.step(t_true, G_true, where="post", lw=1.5, color="#8f6ed4", label="true G")
+
+    for j in range(level):
+        h_prev = hist[j]
+        ax1.plot(h_prev["t_model"], h_prev["pdp_hat"], lw=0.8, color=history_color)
+        ax2.step(h_prev["t_model"], h_prev["G_hat"], where="post", lw=0.8, color=history_color)
+
+    ax1.plot(h["t_model"], h["pdp_hat"], lw=2.0, color=active_color)
+    ax2.step(h["t_model"], h["G_hat"], where="post", lw=2.0, color=active_color)
+
+    t_all = np.concatenate([x["t_model"] for x in hist])
+    pdp_all = np.concatenate([x["pdp_hat"] for x in hist] + [pdp_meas])
+    G_all = np.concatenate([x["G_hat"] for x in hist])
+    if t_true is not None and G_true is not None:
+        G_all = np.concatenate([G_all, G_true])
+
+    tlim = (t_all.min(), t_all.max())
+    pdp_pad = 0.05 * (pdp_all.max() - pdp_all.min()) if pdp_all.size else 0
+    G_pad = 0.05 * (G_all.max() - G_all.min()) if G_all.size else 0
+    ax1.set_xlim(tlim)
+    ax1.set_ylim(pdp_all.min() - pdp_pad, pdp_all.max() + pdp_pad)
+    ax2.set_ylim(G_all.min() - G_pad, G_all.max() + G_pad)
+
+    ax1.set_ylabel("pdp")
+    ax2.set_ylabel("G")
+    ax2.set_xlabel("time")
+    plt.tight_layout()
+    return fig
+
+
+def plot_convergence_history(
+    zoom: dict[str, Any],
+    **kwargs: Any,
+) -> plt.Figure:
+    """Cost vs zoom level."""
+    hist = zoom["history"]
+    costs = [h["result"].cost for h in hist]
+    levels = list(range(len(hist)))
+    fig, ax = plt.subplots()
+    ax.semilogy(levels, costs, "o-", color="#454231")
+    ax.set_xlabel("zoom level")
+    ax.set_ylabel("cost")
+    ax.set_title("Convergence")
+    plt.tight_layout()
+    return fig

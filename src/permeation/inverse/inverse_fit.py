@@ -13,8 +13,8 @@ from typing import Any, Callable
 import numpy as np
 from scipy.optimize import least_squares
 
-from permeation.diffusion import BE, Parameters
-from permeation.materials import multi_step_G, refine_steps, steps_from_starts
+from permeation.physics.diffusion import BE, Parameters
+from permeation.physics.materials import multi_step_G, refine_steps, steps_from_starts
 
 
 def _bin_scores_from_residual(t_meas, r, edges_frac, T=None, weight=None):

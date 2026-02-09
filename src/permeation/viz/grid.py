@@ -10,11 +10,20 @@ from typing import Any
 import matplotlib.pyplot as plt
 import numpy as np
 
-# Time-mode semantic labels: (di, dj) -> mathtext (fallback to raw (di,dj))
-_TIME_STENCIL_LABELS: dict[tuple[int, int], str] = {
-    (0, 0): r"$u^{n+1}$",
-    (-1, 0): r"$u^{n}$",
-}
+
+def _stencil_label_fd(dt: int, dj: int) -> str:
+    """Convert (dt, dj) offset to FD semantic LaTeX: u^{time}_{space}. dt=time, dj=space."""
+    if dt == 0:
+        sup = "n+1"
+    elif dt == -1:
+        sup = "n"
+    else:
+        sup = f"n{1 + dt:+d}"
+    if dj == 0:
+        sub = "j"
+    else:
+        sub = f"j{dj:+d}"
+    return rf"$u^{{{sup}}}_{{{sub}}}$"
 
 
 def plot_grid_stencil(
@@ -22,7 +31,7 @@ def plot_grid_stencil(
     center: tuple[int, int] | None = None,
     stencil: list[tuple[int, int]] | None = None,
     *,
-    labels: bool = False,
+    labels: bool | str = False,
     ax: Any = None,
     title: str | None = None,
     mode: str = "generic",
@@ -32,8 +41,9 @@ def plot_grid_stencil(
     Grid nodes: light gray hollow; center: solid blue; stencil: solid red. Integer
     indices (i, j). Equal aspect, no ticks/spines. Returns Axes.
 
-    With mode="time", axis annotations (time/space), semantic labels (e.g. u^{n+1}),
-    and aspect 1.2 for time-stencil intuition.
+    With mode="time", axis annotations (time/space), semantic FD labels (e.g. u^{n+1}_j),
+    and aspect 1.2 for time-stencil intuition. labels=True shows semantic labels;
+    labels="offset" shows raw (dt, dx) for debugging.
 
     Example
     -------
@@ -73,11 +83,12 @@ def plot_grid_stencil(
                 sj, si, "o", color="#5ca832", fillstyle="full", ms=ms_stencil, zorder=3
             )
             if labels:
-                lbl = (
-                    _TIME_STENCIL_LABELS.get((di, dj), f"({di},{dj})")
-                    if is_time
-                    else f"({di},{dj})"
-                )
+                if labels == "offset":
+                    lbl = f"({di},{dj})"
+                elif is_time:
+                    lbl = _stencil_label_fd(di, dj)
+                else:
+                    lbl = f"({di},{dj})"
                 fs = 26 if is_time else 12
                 ax.annotate(
                     lbl,
@@ -98,8 +109,8 @@ def plot_grid_stencil(
         spine.set_visible(False)
     if is_time:
         ax.annotate(
-            "time →",
-            (0, 1),
+            "time index n →",
+            (-0.03, 1),
             xycoords="axes fraction",
             xytext=(2, -2),
             textcoords="offset points",
@@ -108,7 +119,7 @@ def plot_grid_stencil(
             rotation=90,
         )
         ax.annotate(
-            "space →",
+            "space index j →",
             (1, -0.02),
             xycoords="axes fraction",
             xytext=(-2, 0),

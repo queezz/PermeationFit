@@ -11,6 +11,24 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 
+COLORS_TIME = {
+    "known": "#5ca832",   # n (past, given)
+    "unknown": "#c7a63c",  # n+1 (future, coupled)
+    "focus": "#c73c4c",    # u_j^{n+1} (center unknown)
+}
+
+
+def _time_role(dt: int, dj: int) -> str:
+    """Time-role for coloring: known (n), unknown (n+1), focus (center n+1)."""
+    if dt == -1:
+        return "known"
+    if dt == 0 and dj == 0:
+        return "focus"
+    if dt == 0:
+        return "unknown"
+    return "unknown"
+
+
 def _stencil_label_fd(dt: int, dj: int) -> str:
     """Convert (dt, dj) offset to FD semantic LaTeX: u^{time}_{space}. dt=time, dj=space."""
     if dt == 0:
@@ -74,13 +92,14 @@ def plot_grid_stencil(
         markeredgewidth=3,
     )
 
-    # Stencil nodes: green; time mode = slightly smaller (known past)
+    # Stencil nodes: time mode = color by role (known/unknown/focus); generic = single color
     ms_stencil = 8 if is_time else 10
     for di, dj in stencil:
         si, sj = ci + di, cj + dj
         if 0 <= si < ni and 0 <= sj < nj:
+            color = COLORS_TIME[_time_role(di, dj)] if is_time else "#5ca832"
             ax.plot(
-                sj, si, "o", color="#5ca832", fillstyle="full", ms=ms_stencil, zorder=3
+                sj, si, "o", color=color, fillstyle="full", ms=ms_stencil, zorder=3
             )
             if labels:
                 if labels == "offset":
@@ -98,9 +117,10 @@ def plot_grid_stencil(
                     fontsize=fs,
                 )
 
-    # Center node: reddish; time mode = slightly larger (unknown n+1)
+    # Center node: time mode = focus color from role; generic = same as before
     ms_center = 12 if is_time else 10
-    ax.plot(cj, ci, "o", color="#c73c4c", fillstyle="full", ms=ms_center, zorder=4)
+    center_color = COLORS_TIME[_time_role(0, 0)] if is_time else "#c73c4c"
+    ax.plot(cj, ci, "o", color=center_color, fillstyle="full", ms=ms_center, zorder=4)
 
     ax.set_aspect(1.2 if is_time else "equal")
     ax.set_xticks([])

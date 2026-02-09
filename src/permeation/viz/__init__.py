@@ -1,5 +1,6 @@
 """Visualization for permeation solver and inverse fit."""
 
+from permeation.viz.grid import plot_grid_stencil
 from permeation.viz.plotting import (
     plot_concentration_3d,
     plot_convergence_history,
@@ -13,6 +14,7 @@ from permeation.viz.plotting import (
 )
 
 __all__ = [
+    "plot_grid_stencil",
     "plot_profiles",
     "plot_fluxes",
     "plot_concentration_3d",

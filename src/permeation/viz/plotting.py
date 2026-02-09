@@ -600,7 +600,7 @@ def export_zoom_states_frames(
                 )
 
             t_m, p_m, g_m = curves[k]
-            ax1.plot(t_m, p_m, "-", lw=2.0, color=active_color)
+            ax1.plot(t_m, p_m, "-", lw=2.5, color=active_color, zorder=1)
             ax2.step(t_m, g_m, where="post", lw=2.0, color=active_color)
 
             ax1.set_xlim(tlim)

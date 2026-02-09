@@ -52,18 +52,26 @@ def plot_grid_stencil(
         _, ax = plt.subplots()
 
     # Grid: (i, j) -> x = j, y = i. Time mode: smaller hollow nodes
-    ms_grid = 6 if is_time else 8
+    ms_grid = 10 if is_time else 12
     ii, jj = np.meshgrid(np.arange(ni), np.arange(nj), indexing="ij")
     ax.plot(
-        jj.ravel(), ii.ravel(), "o", color="lightgray", fillstyle="none", ms=ms_grid
+        jj.ravel(),
+        ii.ravel(),
+        "o",
+        color="lightgray",
+        fillstyle="none",
+        ms=ms_grid,
+        markeredgewidth=3,
     )
 
-    # Stencil nodes: red; time mode = slightly smaller (known past)
+    # Stencil nodes: green; time mode = slightly smaller (known past)
     ms_stencil = 8 if is_time else 10
     for di, dj in stencil:
         si, sj = ci + di, cj + dj
         if 0 <= si < ni and 0 <= sj < nj:
-            ax.plot(sj, si, "o", color="red", fillstyle="full", ms=ms_stencil, zorder=3)
+            ax.plot(
+                sj, si, "o", color="#5ca832", fillstyle="full", ms=ms_stencil, zorder=3
+            )
             if labels:
                 lbl = (
                     _TIME_STENCIL_LABELS.get((di, dj), f"({di},{dj})")
@@ -79,9 +87,9 @@ def plot_grid_stencil(
                     fontsize=fs,
                 )
 
-    # Center node: blue; time mode = slightly larger (unknown n+1)
+    # Center node: reddish; time mode = slightly larger (unknown n+1)
     ms_center = 12 if is_time else 10
-    ax.plot(cj, ci, "o", color="blue", fillstyle="full", ms=ms_center, zorder=4)
+    ax.plot(cj, ci, "o", color="#c73c4c", fillstyle="full", ms=ms_center, zorder=4)
 
     ax.set_aspect(1.2 if is_time else "equal")
     ax.set_xticks([])

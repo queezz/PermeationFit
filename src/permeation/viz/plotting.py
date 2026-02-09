@@ -378,6 +378,7 @@ def plot_G(
     return fig
 
 
+# MARK: INV Sum
 def plot_inverse_summary(
     zoom: dict[str, Any],
     t_meas: np.ndarray,
@@ -409,8 +410,22 @@ def plot_inverse_summary(
         ax1.plot(h["t_model"], h["pdp_hat"], "-", lw=1.2, color=color)
         ax2.step(h["t_model"], h["G_hat"], where="post", lw=1.2, color=color)
 
-    ax1.plot(fit["t_model"], fit["pdp_hat"], "-", lw=2.5, color="#454231", label="fit (final)")
-    ax2.step(fit["t_model"], fit["G_hat"], where="post", lw=2.5, color="#454231", label="G (final)")
+    ax1.plot(
+        fit["t_model"],
+        fit["pdp_hat"],
+        "-",
+        lw=2.5,
+        color="#454231",
+        label="fit (final)",
+    )
+    ax2.step(
+        fit["t_model"],
+        fit["G_hat"],
+        where="post",
+        lw=2.5,
+        color="#454231",
+        label="G (final)",
+    )
     if t_true is not None and G_true is not None:
         ax2.step(t_true, G_true, where="post", lw=2, color="#8f6ed4", label="true G")
 
@@ -423,6 +438,7 @@ def plot_inverse_summary(
     return fig, (ax1, ax2)
 
 
+# MARK: zoom frm
 def plot_zoom_frame(
     zoom: dict[str, Any],
     t_meas: np.ndarray,
@@ -456,7 +472,13 @@ def plot_zoom_frame(
     for j in range(level):
         h_prev = hist[j]
         ax1.plot(h_prev["t_model"], h_prev["pdp_hat"], lw=0.8, color=history_color)
-        ax2.step(h_prev["t_model"], h_prev["G_hat"], where="post", lw=0.8, color=history_color)
+        ax2.step(
+            h_prev["t_model"],
+            h_prev["G_hat"],
+            where="post",
+            lw=0.8,
+            color=history_color,
+        )
 
     ax1.plot(h["t_model"], h["pdp_hat"], lw=2.0, color=active_color)
     ax2.step(h["t_model"], h["G_hat"], where="post", lw=2.0, color=active_color)
@@ -481,6 +503,7 @@ def plot_zoom_frame(
     return fig
 
 
+# MARK: Conve Hi
 def plot_convergence_history(
     zoom: dict[str, Any],
     **kwargs: Any,
@@ -498,6 +521,7 @@ def plot_convergence_history(
     return fig
 
 
+# MARK: Export St
 def export_zoom_states_frames(
     zoom: dict[str, Any],
     t_meas: np.ndarray,
@@ -505,7 +529,8 @@ def export_zoom_states_frames(
     base_params: Any,
     *,
     outdir: str = "frames",
-    fade: float = 0.7,
+    fade: float = 0.25,
+    max_hist: int = 20,
     active_color: str = "#b24a3a",
     history_color: str = "0.7",
     dpi: int = 150,
@@ -561,11 +586,18 @@ def export_zoom_states_frames(
 
             ax1.plot(t_meas, pdp_meas, "o", color="black", ms=2)
 
-            for j in range(k):
-                alpha = float(fade ** (k - j))
+            j0 = max(0, k - max_hist)
+
+            for j in range(j0, k):
+                # for j in range(k):
+                age = k - j
+                alpha = 0.25 + 0.75 * np.exp(-fade * age)
+                # alpha = float(fade ** (k - j))
                 t_m, p_m, g_m = curves[j]
                 ax1.plot(t_m, p_m, "-", lw=0.8, color=history_color, alpha=alpha)
-                ax2.step(t_m, g_m, where="post", lw=0.8, color=history_color, alpha=alpha)
+                ax2.step(
+                    t_m, g_m, where="post", lw=0.8, color=history_color, alpha=alpha
+                )
 
             t_m, p_m, g_m = curves[k]
             ax1.plot(t_m, p_m, "-", lw=2.0, color=active_color)

@@ -516,6 +516,56 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#backward-euler-stencil" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Backward Euler stencil
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Backward Euler stencil">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#interpretation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Interpretation
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#key-properties" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Key properties
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#visual-intuition" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Visual intuition
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#time-integration" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -906,6 +956,56 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#backward-euler-stencil" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Backward Euler stencil
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Backward Euler stencil">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#interpretation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Interpretation
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#key-properties" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Key properties
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#visual-intuition" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Visual intuition
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#time-integration" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1081,7 +1181,71 @@
 permeation solver implemented in this project.<br />
 It serves as a <strong>reference anchor</strong> for the solver design, terminology, and
 implementation choices.</p>
-<p>Derivations, stencil diagrams, and visualizations will be added later.</p>
+<hr />
+<h2 id="backward-euler-stencil">Backward Euler stencil<a class="headerlink" href="#backward-euler-stencil" title="Permanent link">&para;</a></h2>
+<p>Consider the 1D diffusion equation</p>
+<div class="arithmatex">\[
+\frac{\partial u}{\partial t} = D \frac{\partial^2 u}{\partial x^2}.
+\]</div>
+<p>Using <strong>Backward Euler</strong> in time and <strong>second-order central differences</strong> in space, we write</p>
+<div class="arithmatex">\[
+\frac{u_j^{n+1} - u_j^n}{\Delta t}
+= D \, \frac{u_{j+1}^{n+1} - 2u_j^{n+1} + u_{j-1}^{n+1}}{\Delta x^2}.
+\]</div>
+<p>Rearranging,</p>
+<div class="arithmatex">\[
+-\alpha\, u_{j-1}^{n+1}
++ (1 + 2\alpha)\, u_j^{n+1}
+- \alpha\, u_{j+1}^{n+1}
+= u_j^n,
+\qquad
+\alpha = D\,\frac{\Delta t}{\Delta x^2}.
+\]</div>
+<figure>
+<p><img alt="Backward Euler stencil" src="../backwards-euler.png" width="80%" /></p>
+</figure>
+<h3 id="interpretation">Interpretation<a class="headerlink" href="#interpretation" title="Permanent link">&para;</a></h3>
+<ul>
+<li>All spatial points at the <strong>new time level <span class="arithmatex">\(n+1\)</span></strong> appear on the left-hand side.<br />
+  They are <strong>unknown</strong> and must be solved <strong>simultaneously</strong>.</li>
+<li>Values at time level <strong><span class="arithmatex">\(n\)</span></strong> appear only on the right-hand side and are <strong>known data</strong>.</li>
+<li>In 1D, this leads to a <strong>tridiagonal linear system</strong> at each time step.</li>
+</ul>
+<h3 id="key-properties">Key properties<a class="headerlink" href="#key-properties" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>Implicit in time</strong> → requires solving a linear system</li>
+<li><strong>Unconditionally stable</strong> for diffusion problems</li>
+<li><strong>First-order accurate</strong> in time, <strong>second-order</strong> in space</li>
+</ul>
+<h3 id="visual-intuition">Visual intuition<a class="headerlink" href="#visual-intuition" title="Permanent link">&para;</a></h3>
+<p>A stencil diagram for this scheme can be generated with the package viz helper (see <a href="https://github.com/queezz/PermeationFit/tree/main/examples">examples</a> notebook <code>backward-euler-stencil.ipynb</code> or <code>permeation.viz.plot_grid_stencil</code> with <code>mode="time"</code>). In the diagram:</p>
+<table>
+<thead>
+<tr>
+<th>Color</th>
+<th>Meaning</th>
+<th>Node</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Green</strong></td>
+<td>Known value (previous time step)</td>
+<td><span class="arithmatex">\(u_j^n\)</span></td>
+</tr>
+<tr>
+<td><strong>Yellow</strong></td>
+<td>Coupled unknowns (same time level)</td>
+<td><span class="arithmatex">\(u_{j\pm1}^{n+1}\)</span></td>
+</tr>
+<tr>
+<td><strong>Red</strong></td>
+<td>Focal unknown (center)</td>
+<td><span class="arithmatex">\(u_j^{n+1}\)</span></td>
+</tr>
+</tbody>
+</table>
+<p>All <strong>yellow</strong> and <strong>red</strong> nodes belong to the same solve at time <span class="arithmatex">\(n+1\)</span>, which is the defining feature of the Backward Euler method.</p>
 <hr />
 <h2 id="time-integration">Time integration<a class="headerlink" href="#time-integration" title="Permanent link">&para;</a></h2>
 <h3 id="backward-euler">Backward Euler<a class="headerlink" href="#backward-euler" title="Permanent link">&para;</a></h3>
@@ -1168,7 +1332,7 @@ iteration.</p>
 <li>Numerical damping of fast transients is expected (typical for Backward Euler).</li>
 <li>Nonlinearity is confined to the boundary treatment.</li>
 </ul>
-<p>Stencil visualizations and convergence illustrations will be added later.</p>
+<p>Stencil diagrams are generated with <code>permeation.viz.plot_grid_stencil(..., mode="time")</code>; see the <a href="https://github.com/queezz/PermeationFit/tree/main/examples">examples</a> folder for the Backward Euler stencil notebook.</p>
 
 
 
